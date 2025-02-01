@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "groupProject.sln"
+    "dotnet.defaultSolution": "Project-Snikersnap.sln"
 }
