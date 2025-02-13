@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class LetterSpawner : MonoBehaviour
 {
@@ -8,31 +9,57 @@ public class LetterSpawner : MonoBehaviour
     public Transform spawnPoint;
     public RectTransform canvasTransform;
     public float spawnInterval = 0.5f;
-    private char currentLetter;
+    public float fallSpeed = 200f;
 
-    // Remove fixed values and calculate based on screen
+    private char currentLetter;
     private float minX;
     private float maxX;
+    private List<RectTransform> activeLetters = new List<RectTransform>();
+    private float destroyY; // Canvas space Y coordinate for destruction
 
     private Color[] colors = new Color[]
     {
-        new Color(0.3f, 0.4f, 1f),    // Sky Blue
-        new Color(0.7f, 0f, 1f),      // Purple
-        new Color(0f, 0.8f, 1f),      // Cyan
-        new Color(1f, 0.84f, 0f),     // Golden Yellow
-        new Color(0.5f, 0.3f, 0.9f),  // Lavender
-        new Color(0f, 0.5f, 1f),      // Ocean Blue
-        new Color(1f, 0.5f, 0.9f),    // Light Pink
-        new Color(0.6f, 0.4f, 0.8f)   // Soft Purple
+        new Color(0.6f, 0.1f, 0.1f),  // Dark Red
+        new Color(0.5f, 0.2f, 0.7f),  // Deep Purple
+        new Color(0.9f, 0.4f, 0f),    // Burnt Orange
+        new Color(0.3f, 0.1f, 0.6f),  // Dark Indigo
+        new Color(0.8f, 0.2f, 0.5f),  // Deep Pink
+        new Color(0.2f, 0.1f, 0.7f),  // Royal Blue
+        new Color(1f, 0.5f, 0.2f),    // Dark Peach
+        new Color(0.6f, 0.3f, 0.2f)   // Dark Brown
     };
 
     void Start()
     {
-        // Calculate spawn width based on screen size
         CalculateSpawnBounds();
-
         GenerateNewLetter();
         InvokeRepeating(nameof(SpawnFallingLetter), 1f, spawnInterval);
+
+        // Convert world space Y=69 to canvas space
+        Vector3 worldDestroyPoint = new Vector3(0, 69, 0);
+        Vector2 canvasDestroyPoint = canvasTransform.InverseTransformPoint(worldDestroyPoint);
+        destroyY = canvasDestroyPoint.y;
+    }
+
+    void Update()
+    {
+        for (int i = activeLetters.Count - 1; i >= 0; i--)
+        {
+            if (activeLetters[i] == null) continue;
+
+            RectTransform letter = activeLetters[i];
+            Vector2 position = letter.anchoredPosition;
+            float newY = position.y - fallSpeed * Time.deltaTime;
+            letter.anchoredPosition = new Vector2(position.x, newY);
+
+            // Convert letter's world position to check against Y=69
+            Vector3 worldPos = canvasTransform.TransformPoint(new Vector3(position.x, newY, 0));
+            if (worldPos.y <= 69)
+            {
+                Destroy(letter.gameObject);
+                activeLetters.RemoveAt(i);
+            }
+        }
     }
 
     void CalculateSpawnBounds()
@@ -41,27 +68,19 @@ public class LetterSpawner : MonoBehaviour
         if (canvas.renderMode == RenderMode.ScreenSpaceOverlay ||
             canvas.renderMode == RenderMode.ScreenSpaceCamera)
         {
-            float screenWidth = Screen.width;
             float canvasWidth = canvasTransform.rect.width;
-
-            // Reduce the width percentage to narrow the spawn area
-            float spawnWidth = canvasWidth * 0.75f; 
-
-            // Shift the range slightly to the right if needed
+            float spawnWidth = canvasWidth * 0.75f;
             float shiftAmount = canvasWidth * 0.534f;
-
             minX = -(spawnWidth * 0.5f) + shiftAmount;
             maxX = (spawnWidth * 0.5f) + shiftAmount;
         }
     }
 
-
-
     void GenerateNewLetter()
     {
         currentLetter = Random.value > 0.5f
-            ? (char)Random.Range(65, 91)  // Capital A-Z
-            : (char)Random.Range(97, 123); // Small a-z
+            ? (char)Random.Range(65, 91)
+            : (char)Random.Range(97, 123);
         mainLetterText.text = currentLetter.ToString();
         mainLetterText.color = colors[Random.Range(0, colors.Length)];
     }
@@ -83,15 +102,15 @@ public class LetterSpawner : MonoBehaviour
 
         if (newLetter.TryGetComponent(out RectTransform rectTransform))
         {
-            // Get spawn point Y but use random X within calculated bounds
             Vector2 spawnPos = spawnPoint.position;
             spawnPos.x = Random.Range(minX, maxX);
-
             rectTransform.anchoredPosition = canvasTransform.InverseTransformPoint(spawnPos);
+            activeLetters.Add(rectTransform);
         }
         else
         {
             Debug.LogError("RectTransform missing on Falling Letter Prefab!");
+            return;
         }
 
         TextMeshProUGUI letterText = newLetter.GetComponentInChildren<TextMeshProUGUI>();
