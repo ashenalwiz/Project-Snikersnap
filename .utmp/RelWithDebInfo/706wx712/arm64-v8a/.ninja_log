@@ -1,0 +1,23 @@
+# ninja log v5
+2712	2991	1739598468726586103	/Users/thinula/Desktop/Project-Snikersnap/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/706wx712/obj/arm64-v8a/libgame.so	5a2f362633fa8495
+3	2711	1739598468455569952	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	7de01b41f01422d4
+21	2528	1739598468271027781	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	15a4cba216e5edc0
+1	2226	1739598467970627730	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	3f69bc7540cf9481
+5	2125	1739598467869062225	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	dc5e043fbf83635e
+24	2121	1739598467862110680	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	f298fbffebd99a18
+10	2099	1739598467836576713	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	f1b6d949250a46ba
+4	2097	1739598467838143269	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	368b1bef3755bab3
+0	2199	1739598467939947562	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	ea95976adfb3c12b
+433	639	1739598466377890991	/Users/thinula/Desktop/Project-Snikersnap/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/706wx712/obj/arm64-v8a/libswappywrapper.so	ec78afe592d47170
+2	432	1739598466178672536	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	48aab14ae7a14133
+7	11162	1740031413250480359	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	48aab14ae7a14133
+3	11944	1740031414028248346	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	f1b6d949250a46ba
+4	11974	1740031414057579027	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	f298fbffebd99a18
+2	12115	1740031414194978274	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	368b1bef3755bab3
+5	12182	1740031414262619176	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	ea95976adfb3c12b
+7	12284	1740031414366581518	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	3f69bc7540cf9481
+2	12393	1740031414479498527	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	dc5e043fbf83635e
+3	12606	1740031414692535764	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	15a4cba216e5edc0
+1	12789	1740031414877334020	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	7de01b41f01422d4
+11164	17967	1740031420051076800	/Users/thinula/Desktop/Project-Snikersnap/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/706wx712/obj/arm64-v8a/libswappywrapper.so	ec78afe592d47170
+12789	17969	1740031420050222340	/Users/thinula/Desktop/Project-Snikersnap/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/706wx712/obj/arm64-v8a/libgame.so	5a2f362633fa8495
