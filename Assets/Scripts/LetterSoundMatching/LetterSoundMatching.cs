@@ -49,7 +49,7 @@ public class LetterSoundMatching : MonoBehaviour
         foreach (char letter in alphabet)
         {
             string letterStr = letter.ToString();
-            AudioClip clip = Resources.Load<AudioClip>($"LetterSoundMatching/Sounds/{letterStr.ToLower()}");
+            AudioClip clip = Resources.Load<AudioClip>($"LetterSoundMatching/Sounds/OGG/{letterStr.ToLower()}");
 
             if (clip == null)
             {
