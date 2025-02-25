@@ -6,39 +6,34 @@ public class LetterSpawner : MonoBehaviour
 {
     public TextMeshProUGUI mainLetterText;
     public GameObject letterPrefab;
-    public Transform spawnPoint;
     public RectTransform canvasTransform;
     public float spawnInterval = 0.5f;
-    public float fallSpeed = 200f;
+    public float fallSpeed = 30f; // Even slower fall speed
+    public int lettersPerSpawn = 3; // Number of letters to spawn simultaneously
 
     private char currentLetter;
-    private float minX;
-    private float maxX;
+    private float minX = -9.68f; // Updated range
+    private float maxX = 3.51f;
     private List<RectTransform> activeLetters = new List<RectTransform>();
-    private float destroyY; // Canvas space Y coordinate for destruction
+    private float destroyY;
 
     private Color[] colors = new Color[]
     {
-        new Color(0.6f, 0.1f, 0.1f),  // Dark Red
-        new Color(0.5f, 0.2f, 0.7f),  // Deep Purple
-        new Color(0.9f, 0.4f, 0f),    // Burnt Orange
-        new Color(0.3f, 0.1f, 0.6f),  // Dark Indigo
-        new Color(0.8f, 0.2f, 0.5f),  // Deep Pink
-        new Color(0.2f, 0.1f, 0.7f),  // Royal Blue
-        new Color(1f, 0.5f, 0.2f),    // Dark Peach
-        new Color(0.6f, 0.3f, 0.2f)   // Dark Brown
+        new Color(0.6f, 0.1f, 0.1f),
+        new Color(0.5f, 0.2f, 0.7f),
+        new Color(0.9f, 0.4f, 0f),
+        new Color(0.3f, 0.1f, 0.6f),
+        new Color(0.8f, 0.2f, 0.5f),
+        new Color(0.2f, 0.1f, 0.7f),
+        new Color(1f, 0.5f, 0.2f),
+        new Color(0.6f, 0.3f, 0.2f)
     };
 
     void Start()
     {
-        CalculateSpawnBounds();
         GenerateNewLetter();
         InvokeRepeating(nameof(SpawnFallingLetter), 1f, spawnInterval);
-
-        // Convert world space Y=69 to canvas space
-        Vector3 worldDestroyPoint = new Vector3(0, 69, 0);
-        Vector2 canvasDestroyPoint = canvasTransform.InverseTransformPoint(worldDestroyPoint);
-        destroyY = canvasDestroyPoint.y;
+        destroyY = -canvasTransform.rect.height / 2;
     }
 
     void Update()
@@ -49,12 +44,14 @@ public class LetterSpawner : MonoBehaviour
 
             RectTransform letter = activeLetters[i];
             Vector2 position = letter.anchoredPosition;
-            float newY = position.y - fallSpeed * Time.deltaTime;
-            letter.anchoredPosition = new Vector2(position.x, newY);
 
-            // Convert letter's world position to check against Y=69
-            Vector3 worldPos = canvasTransform.TransformPoint(new Vector3(position.x, newY, 0));
-            if (worldPos.y <= 69)
+            // ULTRA slow falling effect (almost floating)
+            position.y = Mathf.Lerp(position.y, position.y - 0.1f, Time.deltaTime * 0.001f);
+            position.y -= 0.001f * Time.deltaTime; // Tiny additional movement
+
+            letter.anchoredPosition = position;
+
+            if (position.y <= destroyY)
             {
                 Destroy(letter.gameObject);
                 activeLetters.RemoveAt(i);
@@ -62,19 +59,7 @@ public class LetterSpawner : MonoBehaviour
         }
     }
 
-    void CalculateSpawnBounds()
-    {
-        Canvas canvas = canvasTransform.GetComponent<Canvas>();
-        if (canvas.renderMode == RenderMode.ScreenSpaceOverlay ||
-            canvas.renderMode == RenderMode.ScreenSpaceCamera)
-        {
-            float canvasWidth = canvasTransform.rect.width;
-            float spawnWidth = canvasWidth * 0.75f;
-            float shiftAmount = canvasWidth * 0.534f;
-            minX = -(spawnWidth * 0.5f) + shiftAmount;
-            maxX = (spawnWidth * 0.5f) + shiftAmount;
-        }
-    }
+
 
     void GenerateNewLetter()
     {
@@ -87,41 +72,43 @@ public class LetterSpawner : MonoBehaviour
 
     void SpawnFallingLetter()
     {
-        if (letterPrefab == null || spawnPoint == null || canvasTransform == null)
+        if (letterPrefab == null || canvasTransform == null)
         {
             Debug.LogError("Missing references in LetterSpawner!");
             return;
         }
 
-        char fallingLetter = char.IsUpper(currentLetter)
-            ? (char)Random.Range(97, 123)
-            : (char)Random.Range(65, 91);
+        for (int i = 0; i < lettersPerSpawn; i++)
+        {
+            char fallingLetter = char.IsUpper(currentLetter)
+                ? (char)Random.Range(97, 123)
+                : (char)Random.Range(65, 91);
 
-        GameObject newLetter = Instantiate(letterPrefab, canvasTransform);
-        newLetter.name = "FallingLetter_" + fallingLetter;
+            GameObject newLetter = Instantiate(letterPrefab, canvasTransform);
+            newLetter.name = "FallingLetter_" + fallingLetter;
 
-        if (newLetter.TryGetComponent(out RectTransform rectTransform))
-        {
-            Vector2 spawnPos = spawnPoint.position;
-            spawnPos.x = Random.Range(minX, maxX);
-            rectTransform.anchoredPosition = canvasTransform.InverseTransformPoint(spawnPos);
-            activeLetters.Add(rectTransform);
-        }
-        else
-        {
-            Debug.LogError("RectTransform missing on Falling Letter Prefab!");
-            return;
-        }
+            if (newLetter.TryGetComponent(out RectTransform rectTransform))
+            {
+                Vector2 spawnPos = new Vector2(Random.Range(minX, maxX), canvasTransform.rect.height / 350);
+                rectTransform.anchoredPosition = spawnPos;
+                activeLetters.Add(rectTransform);
+            }
+            else
+            {
+                Debug.LogError("RectTransform missing on Falling Letter Prefab!");
+                continue;
+            }
 
-        TextMeshProUGUI letterText = newLetter.GetComponentInChildren<TextMeshProUGUI>();
-        if (letterText != null)
-        {
-            letterText.text = fallingLetter.ToString();
-            letterText.color = colors[Random.Range(0, colors.Length)];
-        }
-        else
-        {
-            Debug.LogError("TextMeshProUGUI missing on Falling Letter Prefab!");
+            TextMeshProUGUI letterText = newLetter.GetComponentInChildren<TextMeshProUGUI>();
+            if (letterText != null)
+            {
+                letterText.text = fallingLetter.ToString();
+                letterText.color = colors[Random.Range(0, colors.Length)];
+            }
+            else
+            {
+                Debug.LogError("TextMeshProUGUI missing on Falling Letter Prefab!");
+            }
         }
     }
 }
