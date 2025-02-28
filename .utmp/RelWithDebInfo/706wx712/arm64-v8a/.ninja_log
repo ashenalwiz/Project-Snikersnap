@@ -1,0 +1,23 @@
+# ninja log v5
+7	11162	1740031413250480359	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	48aab14ae7a14133
+11164	17967	1740031420051076800	/Users/thinula/Desktop/Project-Snikersnap/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/706wx712/obj/arm64-v8a/libswappywrapper.so	ec78afe592d47170
+5	12182	1740031414262619176	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	ea95976adfb3c12b
+2	12115	1740031414194978274	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	368b1bef3755bab3
+3	11944	1740031414028248346	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	f1b6d949250a46ba
+4	11974	1740031414057579027	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	f298fbffebd99a18
+2	12393	1740031414479498527	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	dc5e043fbf83635e
+3	12606	1740031414692535764	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	15a4cba216e5edc0
+7	12284	1740031414366581518	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	3f69bc7540cf9481
+1	12789	1740031414877334020	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	7de01b41f01422d4
+12789	17969	1740031420050222340	/Users/thinula/Desktop/Project-Snikersnap/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/706wx712/obj/arm64-v8a/libgame.so	5a2f362633fa8495
+16	1549	1740034426189675779	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	48aab14ae7a14133
+1551	2149	1740034426778441552	/Users/thinula/Desktop/Project-Snikersnap/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/706wx712/obj/arm64-v8a/libswappywrapper.so	ec78afe592d47170
+10	3869	1740034428507654333	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	f1b6d949250a46ba
+12	3884	1740034428501691403	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	f298fbffebd99a18
+9	3927	1740034428566310125	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	368b1bef3755bab3
+14	3968	1740034428607501738	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	ea95976adfb3c12b
+15	4169	1740034428808376717	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	3f69bc7540cf9481
+10	4199	1740034428838789057	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	dc5e043fbf83635e
+11	4542	1740034429184044439	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	15a4cba216e5edc0
+8	4780	1740034429421708337	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	7de01b41f01422d4
+4781	5039	1740034429672036708	/Users/thinula/Desktop/Project-Snikersnap/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/706wx712/obj/arm64-v8a/libgame.so	5a2f362633fa8495
