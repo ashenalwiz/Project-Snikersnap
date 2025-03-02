@@ -173,7 +173,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      readaroo_main-removebg-preview_0: 1549785800114274679
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
