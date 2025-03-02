@@ -4,7 +4,7 @@ using System.Collections;
 
 public class Balloon : MonoBehaviour
 {
-    public float speed = 2f;
+    public float speed = 2.5f;
     public TMP_Text numberText;
     private int number;
     public BalloonSpawner spawner;
