@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19bedd638b17440c6934f09de14d81c5, type: 3}
   m_Name: Google Android Provider Settings
   m_EditorClassIdentifier: 
+  m_Logging: 0
   m_Logging: 1
   m_AutomaticPerformanceModeEnabled: 1
   m_AutomaticGameModeEnabled: 0
@@ -315,3 +316,4 @@ MonoBehaviour:
   m_DefaultScalerProfilerIndex: 0
   k_AssetVersion: 2
   m_GoogleProviderLogging: 0
+  m_FrameStatsDialogDisplayed: 1
