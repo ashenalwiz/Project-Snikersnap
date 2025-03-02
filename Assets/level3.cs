@@ -23,11 +23,16 @@ public class WordGameManager : MonoBehaviour
     public Button option2Button;
     public TextMeshProUGUI option1Text;
     public TextMeshProUGUI option2Text;
-    public GameObject correctMessage;
-    public GameObject wrongMessage;
+    public TextMeshProUGUI messageText;  // New TextMeshProUGUI for messages
 
     void Start()
     {
+        if (messageText == null)
+        {
+            Debug.LogError("MessageText UI element is not assigned in the Inspector!");
+            return;
+        }
+
         LoadQuestion();
         replayButton.onClick.AddListener(PlayAudio);
         option1Button.onClick.AddListener(() => CheckAnswer(option1Text.text));
@@ -36,6 +41,12 @@ public class WordGameManager : MonoBehaviour
 
     void LoadQuestion()
     {
+        if (questions == null || questions.Length == 0)
+        {
+            Debug.LogError("Questions array is empty or not assigned in the Inspector!");
+            return;
+        }
+
         if (currentQuestionIndex >= questions.Length)
         {
             Debug.Log("Game Over! No more questions.");
@@ -48,8 +59,7 @@ public class WordGameManager : MonoBehaviour
         option2Text.text = currentQuestion.option2;
         audioSource.clip = currentQuestion.audioClip;
 
-        correctMessage.SetActive(false);
-        wrongMessage.SetActive(false);
+        messageText.text = ""; // Clear message at the start of each question
     }
 
     void PlayAudio()
@@ -57,31 +67,30 @@ public class WordGameManager : MonoBehaviour
         audioSource.Play();
     }
 
-   void CheckAnswer(string selectedAnswer)
-{
-    Question currentQuestion = questions[currentQuestionIndex];
-
-    if (selectedAnswer == currentQuestion.correctAnswer)
+    void CheckAnswer(string selectedAnswer)
     {
-        correctMessage.SetActive(true);
-        wrongMessage.SetActive(false);
-        Debug.Log("Correct Answer! ✅"); // Debugging
+        Question currentQuestion = questions[currentQuestionIndex];
+
+        if (selectedAnswer == currentQuestion.correctAnswer)
+        {
+            messageText.text = "Correct Answer!";
+            messageText.color = Color.green;
+            Debug.Log("Correct Answer!");
+        }
+        else
+        {
+            messageText.text = "Wrong Answer!.";
+            messageText.color = Color.red;
+            Debug.Log("Wrong Answer!");
+        }
+
+        // Move to the next question after a short delay
+        Invoke(nameof(NextQuestion), 1.5f);
     }
-    else
+
+    void NextQuestion()
     {
-        correctMessage.SetActive(false);
-        wrongMessage.SetActive(true);
-        Debug.Log("Wrong Answer! ❌"); // Debugging
+        currentQuestionIndex++;
+        LoadQuestion();
     }
-
-    // Move to the next question after a short delay
-    Invoke(nameof(NextQuestion), 1.5f);
 }
-
-void NextQuestion()
-{
-    currentQuestionIndex++;
-    LoadQuestion();
-}
-
-}  
