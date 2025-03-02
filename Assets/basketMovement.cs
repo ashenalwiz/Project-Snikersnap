@@ -1,13 +1,14 @@
+
 using UnityEngine;
 using TMPro;
 
 public class BasketController : MonoBehaviour
 {
-    public SpriteRenderer basketRenderer; // Assign in Inspector
-    public Color correctColor = Color.green;  // Basket glows green for correct letter
-    public Color incorrectColor = Color.red;  // Basket glows red for incorrect letter
-    public Color defaultColor = Color.white;  // Default basket color
-    private float colorResetTime = 0.5f; // Time before resetting color
+    public SpriteRenderer basketRenderer;
+    public Color correctColor = Color.green;
+    public Color incorrectColor = Color.red;
+    public Color defaultColor = Color.white;
+    private float colorResetTime = 0.5f;
 
     private Vector3 offset;
     private bool isDragging = false;
@@ -70,14 +71,16 @@ public class BasketController : MonoBehaviour
             if (char.ToLower(fallingLetter) == char.ToLower(mainLetter))
             {
                 basketRenderer.color = correctColor; // Glow green for correct letter
+                ProgressManager.Instance.UpdateProgress(1); // Increase progress
             }
             else
             {
                 basketRenderer.color = incorrectColor; // Glow red for incorrect letter
+                ProgressManager.Instance.UpdateProgress(-1); // Decrease progress
             }
 
             Destroy(other.gameObject); // Remove caught letter
-            Invoke(nameof(ResetColor), colorResetTime); // Reset color after delay
+            Invoke(nameof(ResetColor), colorResetTime);
         }
     }
 

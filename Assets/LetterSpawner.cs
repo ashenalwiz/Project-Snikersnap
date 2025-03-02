@@ -8,14 +8,17 @@ public class LetterSpawner : MonoBehaviour
     public GameObject letterPrefab;
     public RectTransform canvasTransform;
     public float spawnInterval = 0.5f;
-    public float fallSpeed = 30f; // Even slower fall speed
-    public int lettersPerSpawn = 3; // Number of letters to spawn simultaneously
+    public float fallSpeed = 30f;
+    public int lettersPerSpawn = 3;
+    [Range(0, 1)]
+    public float matchingLetterChance = 0.2f; // 20% chance for matching letters
 
     private char currentLetter;
-    private float minX = -9.68f; // Updated range
+    private float minX = -9.68f;
     private float maxX = 3.51f;
     private List<RectTransform> activeLetters = new List<RectTransform>();
     private float destroyY;
+    private bool isSpawning = false;
 
     private Color[] colors = new Color[]
     {
@@ -31,9 +34,11 @@ public class LetterSpawner : MonoBehaviour
 
     void Start()
     {
-        GenerateNewLetter();
-        InvokeRepeating(nameof(SpawnFallingLetter), 1f, spawnInterval);
+        // Initialize values but don't start spawning yet
         destroyY = -canvasTransform.rect.height / 2;
+        GenerateNewLetter();
+
+        // We'll start spawning after the countdown finishes
     }
 
     void Update()
@@ -59,15 +64,46 @@ public class LetterSpawner : MonoBehaviour
         }
     }
 
+    // Call this method after countdown finishes
+    public void StartLetterSpawning()
+    {
+        if (!isSpawning)
+        {
+            isSpawning = true;
+            GenerateNewLetter();
+            InvokeRepeating(nameof(SpawnFallingLetter), 1f, spawnInterval);
+        }
+    }
 
+    // Call this to stop spawning (e.g. when game pauses)
+    public void StopLetterSpawning()
+    {
+        if (isSpawning)
+        {
+            isSpawning = false;
+            CancelInvoke(nameof(SpawnFallingLetter));
+        }
+    }
 
-    void GenerateNewLetter()
+    public void GenerateNewLetter()
     {
         currentLetter = Random.value > 0.5f
-            ? (char)Random.Range(65, 91)
-            : (char)Random.Range(97, 123);
+            ? (char)Random.Range(65, 91) // Uppercase A-Z
+            : (char)Random.Range(97, 123); // Lowercase a-z
         mainLetterText.text = currentLetter.ToString();
         mainLetterText.color = colors[Random.Range(0, colors.Length)];
+    }
+
+    public void ClearFallingLetters()
+    {
+        for (int i = activeLetters.Count - 1; i >= 0; i--)
+        {
+            if (activeLetters[i] != null)
+            {
+                Destroy(activeLetters[i].gameObject);
+            }
+        }
+        activeLetters.Clear();
     }
 
     void SpawnFallingLetter()
@@ -80,9 +116,32 @@ public class LetterSpawner : MonoBehaviour
 
         for (int i = 0; i < lettersPerSpawn; i++)
         {
-            char fallingLetter = char.IsUpper(currentLetter)
-                ? (char)Random.Range(97, 123)
-                : (char)Random.Range(65, 91);
+            char fallingLetter;
+
+            // Determine if this letter should match the main letter (with opposite case)
+            bool shouldMatch = Random.value <= matchingLetterChance;
+
+            if (shouldMatch)
+            {
+                // Use the opposite case of the current letter
+                fallingLetter = char.IsUpper(currentLetter)
+                    ? char.ToLower(currentLetter)
+                    : char.ToUpper(currentLetter);
+            }
+            else
+            {
+                // Generate a random letter of the opposite case
+                // Make sure it's not the same letter as the main letter (even in different case)
+                char randomLetter;
+                do
+                {
+                    randomLetter = char.IsUpper(currentLetter)
+                        ? (char)Random.Range(97, 123)  // lowercase a-z
+                        : (char)Random.Range(65, 91);  // uppercase A-Z
+                } while (char.ToUpper(randomLetter) == char.ToUpper(currentLetter));
+
+                fallingLetter = randomLetter;
+            }
 
             GameObject newLetter = Instantiate(letterPrefab, canvasTransform);
             newLetter.name = "FallingLetter_" + fallingLetter;
