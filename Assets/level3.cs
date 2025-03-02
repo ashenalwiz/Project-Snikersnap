@@ -57,19 +57,31 @@ public class WordGameManager : MonoBehaviour
         audioSource.Play();
     }
 
-    void CheckAnswer(string selectedAnswer)
-    {
-        Question currentQuestion = questions[currentQuestionIndex];
+   void CheckAnswer(string selectedAnswer)
+{
+    Question currentQuestion = questions[currentQuestionIndex];
 
-        if (selectedAnswer == currentQuestion.correctAnswer)
-        {
-            correctMessage.SetActive(true);
-            wrongMessage.SetActive(false);
-        }
-        else
-        {
-            correctMessage.SetActive(false);
-            wrongMessage.SetActive(true);
-        }
+    if (selectedAnswer == currentQuestion.correctAnswer)
+    {
+        correctMessage.SetActive(true);
+        wrongMessage.SetActive(false);
+        Debug.Log("Correct Answer! ✅"); // Debugging
     }
+    else
+    {
+        correctMessage.SetActive(false);
+        wrongMessage.SetActive(true);
+        Debug.Log("Wrong Answer! ❌"); // Debugging
+    }
+
+    // Move to the next question after a short delay
+    Invoke(nameof(NextQuestion), 1.5f);
 }
+
+void NextQuestion()
+{
+    currentQuestionIndex++;
+    LoadQuestion();
+}
+
+}  

@@ -255,6 +255,64 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 182363462}
   m_CullTransparentMesh: 1
+--- !u!1 &502855949
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 502855951}
+  - component: {fileID: 502855950}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &502855950
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 502855949}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02199163e18aff3408c00e86d81553bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  questions:
+  - word: Dear
+    option1: Dear
+    option2: Dare
+    audioClip: {fileID: 8300000, guid: 901fe9e4f4929bd4c8315e4aaf8601df, type: 3}
+    correctAnswer: Dear
+  audioSource: {fileID: 1658914416}
+  replayButton: {fileID: 1634915463}
+  option1Button: {fileID: 1773807161}
+  option2Button: {fileID: 1585076200}
+  option1Text: {fileID: 182363464}
+  option2Text: {fileID: 1090283992}
+  correctMessage: {fileID: 1938827166}
+  wrongMessage: {fileID: 898722244}
+--- !u!4 &502855951
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 502855949}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 661.0987, y: 284.3196, z: -1.517146}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &898722244
 GameObject:
   m_ObjectHideFlags: 0
@@ -299,7 +357,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 898722244}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
@@ -1648,3 +1706,4 @@ SceneRoots:
   - {fileID: 1485440274}
   - {fileID: 1949064555}
   - {fileID: 1658914417}
+  - {fileID: 502855951}
