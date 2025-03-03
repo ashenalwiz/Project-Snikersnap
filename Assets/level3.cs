@@ -18,12 +18,16 @@ public class WordGameManager : MonoBehaviour
     private int currentQuestionIndex = 0;
 
     public AudioSource audioSource;
+    public AudioSource messageAudioSource;  // New AudioSource for messages
+    public AudioClip correctSound; // Correct answer sound
+    public AudioClip wrongSound;   // Wrong answer sound
+
     public Button replayButton;
     public Button option1Button;
     public Button option2Button;
     public TextMeshProUGUI option1Text;
     public TextMeshProUGUI option2Text;
-    public TextMeshProUGUI messageText;  // New TextMeshProUGUI for messages
+    public TextMeshProUGUI messageText;  // TextMeshProUGUI for messages
 
     void Start()
     {
@@ -73,14 +77,16 @@ public class WordGameManager : MonoBehaviour
 
         if (selectedAnswer == currentQuestion.correctAnswer)
         {
-            messageText.text = "Correct Answer!";
+            messageText.text = "✅ Correct Answer!";
             messageText.color = Color.green;
+            messageAudioSource.PlayOneShot(correctSound); // Play correct answer sound
             Debug.Log("Correct Answer!");
         }
         else
         {
-            messageText.text = "Wrong Answer!.";
+            messageText.text = "❌ Wrong Answer! Try Again.";
             messageText.color = Color.red;
+            messageAudioSource.PlayOneShot(wrongSound); // Play wrong answer sound
             Debug.Log("Wrong Answer!");
         }
 
