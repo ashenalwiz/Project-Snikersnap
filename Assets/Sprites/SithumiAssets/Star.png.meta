@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 394fe8f58a89a49459259b6c7d3b74c3
+guid: 30cc2cbd4b00b4d45ac889fba2f27649
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 2768992596504944150
-    second: star2_0
+      213: 5199979006384268662
+    second: Star_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -122,30 +122,17 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: iOS
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: star2_0
+      name: Star_0
       rect:
         serializedVersion: 2
-        x: 25
-        y: 31
-        width: 314
-        height: 300
+        x: 118
+        y: 53
+        width: 343
+        height: 325
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -154,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 61e1d5488107d6620800000000000000
-      internalID: 2768992596504944150
+      spriteID: 675e50b0b590a2840800000000000000
+      internalID: 5199979006384268662
       vertices: []
       indices: 
       edges: []
@@ -174,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      star2_0: 2768992596504944150
+      Star_0: 5199979006384268662
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
