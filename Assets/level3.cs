@@ -30,6 +30,7 @@ public class WordGameManager : MonoBehaviour
     public TextMeshProUGUI option2Text;
     public TextMeshProUGUI messageText;  // TextMeshProUGUI for messages
     public TextMeshProUGUI scoreText;    // TextMeshProUGUI to display the score
+    public GameObject gameOverImage; // Game Over Image
 
     void Start()
     {
@@ -45,6 +46,13 @@ public class WordGameManager : MonoBehaviour
             return;
         }
 
+        if (gameOverImage == null)
+        {
+            Debug.LogError("GameOverImage UI element is not assigned in the Inspector!");
+            return;
+        }
+
+        gameOverImage.SetActive(false); // Hide Game Over image at the start
         scoreText.text = "Score: " + score;  // Initialize the score display
 
         LoadQuestion();
@@ -64,6 +72,7 @@ public class WordGameManager : MonoBehaviour
         if (currentQuestionIndex >= questions.Length)
         {
             Debug.Log("Game Over! No more questions.");
+            GameOver();
             return;
         }
 
@@ -109,6 +118,20 @@ public class WordGameManager : MonoBehaviour
     void NextQuestion()
     {
         currentQuestionIndex++;
-        LoadQuestion();
+
+        if (currentQuestionIndex >= questions.Length)
+        {
+            GameOver(); // Call GameOver when all questions are completed
+        }
+        else
+        {
+            LoadQuestion();
+        }
+    }
+
+    void GameOver()
+    {
+        gameOverImage.SetActive(true); // Show Game Over image
+        Debug.Log("Game Over! Displaying Game Over Image.");
     }
 }
