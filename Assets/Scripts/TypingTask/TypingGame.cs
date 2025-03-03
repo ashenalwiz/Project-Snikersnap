@@ -31,6 +31,7 @@ public class TypingGame : MonoBehaviour
 
     private int correctAnswers = 0;
     private int skippedWords = 0;
+    public Button replayButton;
     //-----------------------------------------------------
 
 
@@ -46,6 +47,8 @@ public class TypingGame : MonoBehaviour
 
         //--------Update---------------------------
         resultPanel.SetActive(false);
+        replayButton.gameObject.SetActive(false); // Hide replay button at start
+        replayButton.onClick.AddListener(ReplayGame);
         //-----------------------------------------
 
         playAudioButton.onClick.AddListener(PlayWordAudio);
@@ -240,11 +243,21 @@ public class TypingGame : MonoBehaviour
         wordInputField.gameObject.SetActive(false);
 
         ShowStars(score);
+
+        replayButton.gameObject.SetActive(true);
+        replayButton.interactable = true;
+        Debug.Log("Replay Button Should Be Visible Now");
     }
     void ShowStars(float score)
     {
         resultPanel.SetActive(true); // Show result UI
         finalScoreText.text = "Final Score: " + score.ToString("F0") + "%"; // Show final percentage
+
+
+        replayButton.gameObject.SetActive(true);
+        replayButton.interactable = true;
+
+
 
         // Hide all stars initially
         foreach (Image star in starImages)
@@ -267,6 +280,34 @@ public class TypingGame : MonoBehaviour
         }
         // If below 50%, no stars are shown
     }
+
+    void ReplayGame()
+    {
+        currentWordIndex = 0;
+        correctAnswers = 0;
+        skippedWords = 0;
+        attempts = 0;
+
+        wordInputField.text = "";
+        feedbackText.text = "";
+
+        checkButton.interactable = true;
+        skipButton.interactable = true;
+        wordInputField.gameObject.SetActive(true);
+        hintImage.gameObject.SetActive(false);
+        skipButton.gameObject.SetActive(false);
+
+        resultPanel.SetActive(false);
+        replayButton.gameObject.SetActive(false); // Hide replay button
+
+        foreach (Image star in starImages)
+        {
+            star.gameObject.SetActive(false);
+        }
+
+        PlayWordAudio(); // Start first word again
+    }
+
 
 
 }
