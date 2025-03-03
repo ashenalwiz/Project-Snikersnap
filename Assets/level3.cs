@@ -16,6 +16,7 @@ public class WordGameManager : MonoBehaviour
 
     public Question[] questions;
     private int currentQuestionIndex = 0;
+    private int score = 0; // Score variable to keep track of the correct answers
 
     public AudioSource audioSource;
     public AudioSource messageAudioSource;  // New AudioSource for messages
@@ -28,6 +29,7 @@ public class WordGameManager : MonoBehaviour
     public TextMeshProUGUI option1Text;
     public TextMeshProUGUI option2Text;
     public TextMeshProUGUI messageText;  // TextMeshProUGUI for messages
+    public TextMeshProUGUI scoreText;    // TextMeshProUGUI to display the score
 
     void Start()
     {
@@ -36,6 +38,14 @@ public class WordGameManager : MonoBehaviour
             Debug.LogError("MessageText UI element is not assigned in the Inspector!");
             return;
         }
+
+        if (scoreText == null)
+        {
+            Debug.LogError("ScoreText UI element is not assigned in the Inspector!");
+            return;
+        }
+
+        scoreText.text = "Score: " + score;  // Initialize the score display
 
         LoadQuestion();
         replayButton.onClick.AddListener(PlayAudio);
@@ -80,6 +90,8 @@ public class WordGameManager : MonoBehaviour
             messageText.text = "✅ Correct Answer!";
             messageText.color = Color.green;
             messageAudioSource.PlayOneShot(correctSound); // Play correct answer sound
+            score++;  // Increment the score for the correct answer
+            scoreText.text = "Score: " + score;  // Update the score display
             Debug.Log("Correct Answer!");
         }
         else
