@@ -12,8 +12,11 @@ EditorBuildSettings:
     path: Assets/Scenes/LetterSoundMatching.unity
     guid: 88a57e9474ec6475eb682291a32cf380
   m_configObjects:
+
+    com.unity.adaptiveperformance.samsung.android.provider_settings: {fileID: 11400000, guid: b8e0071a0c490e74b96e0b88a6cab6e5, type: 2}
     com.unity.adaptiveperformance.google.android.provider_settings: {fileID: 11400000, guid: 0bbb9ffb6ee4a3b4aa5673f62fe778dd, type: 2}
     com.unity.adaptiveperformance.loader_settings: {fileID: 11400000, guid: 6aaccf203b56b724c988adfb5da7a415, type: 2}
+
     com.unity.adaptiveperformance.simulator.provider_settings: {fileID: 11400000, guid: 70d2e847241beab45b3b363a5407390e, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0
