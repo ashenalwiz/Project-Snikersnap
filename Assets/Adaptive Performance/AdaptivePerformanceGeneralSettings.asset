@@ -1,6 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-8185954267969391668
 MonoBehaviour:
   m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
@@ -14,7 +13,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_LoaderManagerInstance: {fileID: -4145721459692132574}
   m_InitManagerOnStart: 1
---- !u!114 &-8056348874726207620
+--- !u!114 &-805S6348874726207620
 MonoBehaviour:
   m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
@@ -42,7 +41,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_LoaderManagerInstance: {fileID: 2898647502982949804}
   m_InitManagerOnStart: 0
---- !u!114 &-4145721459692132574
+--- !u!114 &-1525593676035637480
 MonoBehaviour:
   m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
@@ -57,7 +56,6 @@ MonoBehaviour:
   m_AutomaticLoading: 0
   m_AutomaticRunning: 0
   m_Loaders:
-  - {fileID: 11400000, guid: f9ce633ba059d1e4f927781083f4919a, type: 2}
 --- !u!114 &-2518261344509434447
 MonoBehaviour:
   m_ObjectHideFlags: 2
@@ -119,6 +117,9 @@ MonoBehaviour:
   m_AutomaticLoading: 0
   m_AutomaticRunning: 0
   m_Loaders: []
+
+  - {fileID: 11400000, guid: b6473dcd943bb46fd89c095bf74901d3, type: 2}
+
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 2
@@ -131,12 +132,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb0ece14d1f711a4fb9325ca819dee95, type: 3}
   m_Name: AdaptivePerformanceGeneralSettings
   m_EditorClassIdentifier: 
-  Keys: 07000000010000000d000000
+
+  Keys: 07000000
   Values:
-  - {fileID: -8185954267969391668}
-  - {fileID: -8056348874726207620}
-  - {fileID: -6768309784223805763}
---- !u!114 &2898647502982949804
+  - {fileID: 1680394137389996710}
+  - {fileID: 631966923554410647}
+
+--- !u!114 &1680394137389996710
 MonoBehaviour:
   m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
@@ -145,9 +147,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 536372c49e1ca914d822849d36de938c, type: 3}
-  m_Name: WebGL Providers
-  m_EditorClassIdentifier: 
   m_AutomaticLoading: 0
   m_AutomaticRunning: 0
   m_Loaders: []
@@ -166,3 +165,8 @@ MonoBehaviour:
   m_AutomaticLoading: 0
   m_AutomaticRunning: 0
   m_Loaders: []
+  m_Script: {fileID: 11500000, guid: 179fc3111e144bc4688dca4038b3265d, type: 3}
+  m_Name: Android Settings
+  m_EditorClassIdentifier: 
+  m_LoaderManagerInstance: {fileID: -7956273102278903809}
+  m_InitManagerOnStart: 1
