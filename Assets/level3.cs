@@ -96,8 +96,8 @@ public class WordGameManager : MonoBehaviour
 
         if (selectedAnswer == currentQuestion.correctAnswer)
         {
-            messageText.text = "✅ Correct Answer!";
-            messageText.color = Color.green;
+            messageText.text = " Correct Answer!";
+            messageText.color = Color.black;
             messageAudioSource.PlayOneShot(correctSound); // Play correct answer sound
             score++;  // Increment the score for the correct answer
             scoreText.text = "Score: " + score;  // Update the score display
@@ -105,7 +105,7 @@ public class WordGameManager : MonoBehaviour
         }
         else
         {
-            messageText.text = "❌ Wrong Answer! Try Again.";
+            messageText.text = " Wrong Answer";
             messageText.color = Color.red;
             messageAudioSource.PlayOneShot(wrongSound); // Play wrong answer sound
             Debug.Log("Wrong Answer!");
