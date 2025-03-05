@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 36ffd6549b3d4da48bcc5459e7d09c9e
+guid: 495d7f3d9caf2294d8d281ef0d918f19
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -5051437467666921643
-    second: forest background_0
+      213: 7822112587111204412
+    second: 3-removebg-preview_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -139,13 +139,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: forest background_0
+      name: 3-removebg-preview_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 1600
-        height: 800
+        x: 33
+        y: 47
+        width: 477
+        height: 355
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -154,8 +154,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 5574d960360b5e9b0800000000000000
-      internalID: -5051437467666921643
+      spriteID: c3600e364f9bd8c60800000000000000
+      internalID: 7822112587111204412
       vertices: []
       indices: 
       edges: []
@@ -173,8 +173,7 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable:
-      forest background_0: -5051437467666921643
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
