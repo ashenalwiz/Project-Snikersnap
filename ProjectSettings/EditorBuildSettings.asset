@@ -11,6 +11,15 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/LetterSoundMatching.unity
     guid: 88a57e9474ec6475eb682291a32cf380
+  - enabled: 1
+    path: Assets/Scenes/TaskHolder.unity
+    guid: 9ca279022a834434abf4ced8928b1697
+  - enabled: 1
+    path: Assets/Scenes/TypingTaskV2.unity
+    guid: cca792337fcc7494f8135bb512cd49b6
+  - enabled: 1
+    path: Assets/Scenes/MainMenu.unity
+    guid: 941c6668e99812c46b9902bfb2ed82cd
   m_configObjects:
     com.unity.adaptiveperformance.google.android.provider_settings: {fileID: 11400000, guid: 0bbb9ffb6ee4a3b4aa5673f62fe778dd, type: 2}
     com.unity.adaptiveperformance.loader_settings: {fileID: 11400000, guid: 6aaccf203b56b724c988adfb5da7a415, type: 2}
