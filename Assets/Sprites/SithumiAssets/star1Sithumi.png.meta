@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 3921b44ee4e52834482a3b5c3dda8688
+guid: 5ee82de7d2c622f488f809ea812dc48f
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -5752518688381342364
-    second: sithumibackground4_0
+      213: 2914788299563756529
+    second: star3_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -122,17 +122,30 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: sithumibackground4_0
+      name: star3_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 1741
-        height: 980
+        x: 15
+        y: 12
+        width: 246
+        height: 256
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,8 +154,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 46deb372bb2fa20b0800000000000000
-      internalID: -5752518688381342364
+      spriteID: 1fb66f6e388637820800000000000000
+      internalID: 2914788299563756529
       vertices: []
       indices: 
       edges: []
@@ -160,7 +173,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      star3_0: 2914788299563756529
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

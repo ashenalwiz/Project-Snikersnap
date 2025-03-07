@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 3921b44ee4e52834482a3b5c3dda8688
+guid: 321234618ca200f479af109a3aa35f0f
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -5752518688381342364
-    second: sithumibackground4_0
+      213: -5606718777101302656
+    second: volcano_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -126,13 +126,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: sithumibackground4_0
+      name: volcano_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 1741
-        height: 980
+        width: 5534
+        height: 4016
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 46deb372bb2fa20b0800000000000000
-      internalID: -5752518688381342364
+      spriteID: 0844d575afee032b0800000000000000
+      internalID: -5606718777101302656
       vertices: []
       indices: 
       edges: []
@@ -160,7 +160,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      volcano_0: -5606718777101302656
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
