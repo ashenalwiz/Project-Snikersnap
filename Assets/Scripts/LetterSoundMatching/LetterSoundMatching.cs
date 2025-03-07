@@ -404,7 +404,7 @@ public class LetterSoundMatching : MonoBehaviour
     {
         try
         {
-            string filePath = Path.Combine(Application.persistentDataPath, "LetterProgress.json");
+            string filePath = System.IO.Path.Combine(Application.persistentDataPath, "LetterProgress.json");
             if (File.Exists(filePath))
             {
                 string json = File.ReadAllText(filePath);
@@ -434,7 +434,7 @@ public class LetterSoundMatching : MonoBehaviour
     {
         try
         {
-            string filePath = Path.Combine(Application.persistentDataPath, "LetterProgress.json");
+            string filePath = System.IO.Path.Combine(Application.persistentDataPath, "LetterProgress.json");
             PlayerProgressData data = new PlayerProgressData();
             data.letters = new PlayerLetterProgress[letterProgress.Count];
             
@@ -459,7 +459,7 @@ void SaveSessionSummary()
 {
     try
     {
-        string filePath = Path.Combine(Application.persistentDataPath, "SessionHistory.json");
+        string filePath = System.IO.Path.Combine(Application.persistentDataPath, "SessionHistory.json");
         SessionData newSession = new SessionData
         {
             date = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
@@ -589,7 +589,7 @@ void UpdateProgressPanel()
     // Display session history
     try
     {
-        string filePath = Path.Combine(Application.persistentDataPath, "SessionHistory.json");
+        string filePath = System.IO.Path.Combine(Application.persistentDataPath, "SessionHistory.json");
         if (File.Exists(filePath))
         {
             string json = File.ReadAllText(filePath);
@@ -637,7 +637,7 @@ void LogToFile(string message)
     #if UNITY_ANDROID && !UNITY_EDITOR
     try
     {
-        string filePath = Path.Combine(Application.persistentDataPath, "LetterGameLog.txt");
+        string filePath = System.IO.Path.Combine(Application.persistentDataPath, "LetterGameLog.txt");
         using (StreamWriter writer = new StreamWriter(filePath, true))
         {
             writer.WriteLine($"{System.DateTime.Now}: {message}");
