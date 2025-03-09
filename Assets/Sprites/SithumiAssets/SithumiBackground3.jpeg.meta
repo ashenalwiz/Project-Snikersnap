@@ -160,7 +160,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      SithumiBackground3_0: 7170163474137687299
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
