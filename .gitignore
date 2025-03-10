@@ -79,3 +79,26 @@ Assets/Firebase/
 Assets/StreamingAssets/google-services.json
 Assets/StreamingAssets/GoogleService-Info.plist
 
+# Firebase-related files
+Assets/Editor Default Resources/Firebase/
+Assets/Plugins/iOS/Firebase/
+Assets/Plugins/tvOS/Firebase/
+
+# Firebase meta files
+Assets/Editor Default Resources/Firebase/*.meta
+Assets/Firebase.meta
+Assets/Plugins/iOS/Firebase/*.meta
+Assets/Plugins/tvOS/Firebase/*.meta
+
+# Firebase libraries (compiled .a files)
+Assets/Plugins/iOS/Firebase/*.a
+Assets/Plugins/tvOS/Firebase/*.a
+
+# Other potential Unity generated files
+.idea/
+.vscode/
+.DS_Store
+*.log
+*.bak
+*.swp
+
