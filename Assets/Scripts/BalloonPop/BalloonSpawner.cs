@@ -4,13 +4,13 @@ using System.Collections.Generic;
 public class BalloonSpawner : MonoBehaviour
 {
     public GameObject balloonPrefab;
-    public Transform spawnPoint;
+   // public Transform spawnPoint;
     private int activeBalloons = 0;
     private bool canSpawnBalloons = true;
 
     private readonly List<Vector2> availablePositions = new()
     {
-        new Vector2(-6f, -6f),
+        new Vector2(-6f, -6f),   // Predefined positions for spawning balloons
         new Vector2(-3f, -7f),
         new Vector2(0f, -5.5f),
         new Vector2(3f, -6.5f),
@@ -23,7 +23,7 @@ public class BalloonSpawner : MonoBehaviour
         SpawnBalloons();
     }
 
-    public void HideAllBalloons()
+    public void HideAllBalloons() // hide all balloons in the scene
     {
         foreach (GameObject balloon in GameObject.FindGameObjectsWithTag("Balloon"))
         {
@@ -31,7 +31,7 @@ public class BalloonSpawner : MonoBehaviour
         }
     }
 
-    public void ShowAllBalloons()
+    public void ShowAllBalloons() // Shows all balloons in the scene
     {
         foreach (GameObject balloon in GameObject.FindGameObjectsWithTag("Balloon"))
         {
@@ -43,9 +43,11 @@ public class BalloonSpawner : MonoBehaviour
     {
         if (!canSpawnBalloons) return;
 
+        // Gets reference to the GameManager
         GameManagerThrishali gameManager = FindAnyObjectByType<GameManagerThrishali>();
         if (gameManager == null || gameManager.IsGameOver()) return;
 
+        // Removes any existing balloons before spawning new ones
         foreach (GameObject balloon in GameObject.FindGameObjectsWithTag("Balloon"))
         {
             Destroy(balloon);
@@ -60,6 +62,7 @@ public class BalloonSpawner : MonoBehaviour
 
         activeBalloons = totalBalloons;
 
+        // Spawn balloons with numbers
         for (int i = 0; i < totalBalloons; i++)
         {
             Vector2 spawnPos = shuffledPositions[i];
@@ -69,11 +72,12 @@ public class BalloonSpawner : MonoBehaviour
             if (balloonScript != null)
             {
                 balloonScript.spawner = this;
+                // First balloon gets the correct number, others get random numbers
                 balloonScript.SetNumber(i == 0 ? correctNumber : Random.Range(1, 11));
             }
         }
     }
-
+    // Called when a balloon is destroyed to track the remaining balloon
     public void BalloonDestroyed()
     {
         activeBalloons--;
@@ -83,6 +87,7 @@ public class BalloonSpawner : MonoBehaviour
         }
     }
 
+    // Checks if there are no balloons left and respawns them
     void CheckAndRespawn()
     {
         if (Object.FindObjectsByType<Balloon>(FindObjectsSortMode.None).Length == 0 && canSpawnBalloons)
@@ -101,7 +106,7 @@ public class BalloonSpawner : MonoBehaviour
         }
     }
 
-    public void StopSpawningBalloons() => canSpawnBalloons = false;
-    public void ResumeSpawningBalloons() => canSpawnBalloons = true;
+    public void StopSpawningBalloons() => canSpawnBalloons = false;  // Stops the spawning of balloons
+    public void ResumeSpawningBalloons() => canSpawnBalloons = true;  // Resumes the spawning of balloons
 }
 

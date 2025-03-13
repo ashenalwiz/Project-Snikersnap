@@ -2,7 +2,6 @@
 using TMPro;
 using System.Collections;
 using System.Collections.Generic;
-//using System.Linq;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
@@ -30,9 +29,9 @@ public class GameManagerThrishali : MonoBehaviour
     private List<ProgressData> progressList = new List<ProgressData>();
     private Dictionary<int, ProgressData> progressDict = new Dictionary<int, ProgressData>();
 
-
     private BalloonSpawner balloonSpawner;
 
+    
     private void Start()
     {
         progressPanel.SetActive(false);
@@ -197,6 +196,7 @@ public class GameManagerThrishali : MonoBehaviour
         chancesText.gameObject.SetActive(false);
         scoreText.gameObject.SetActive(false);
         missedNumberText.gameObject.SetActive(false);
+        //SetBlurVisibility(false);
 
         StartCoroutine(ShowFinalMessage());
         
@@ -204,6 +204,7 @@ public class GameManagerThrishali : MonoBehaviour
     private IEnumerator ShowFinalMessage()
     
     {
+        
         gameOverText.text = $"Congratulations!\nYou earned {score} Points";
         gameOverText.gameObject.SetActive(true);
         audioSource.PlayOneShot(gameOverSound);
@@ -234,6 +235,8 @@ public class GameManagerThrishali : MonoBehaviour
         string sessionData = $"{sessionID},{System.DateTime.Now.ToString("yyyy-MM-dd")},{overallAccuracy:F1}";
         PlayerPrefs.SetString(sessionKey, sessionData);
 
+        //PlayerPrefs.DeleteAll(); // Clears all saved PlayerPrefs
+       
         PlayerPrefs.Save();
     }
 
