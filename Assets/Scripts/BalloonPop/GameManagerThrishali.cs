@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System.IO;
 
 public class GameManagerThrishali : MonoBehaviour
 {
@@ -28,6 +29,8 @@ public class GameManagerThrishali : MonoBehaviour
     [SerializeReference]
     private List<ProgressData> progressList = new List<ProgressData>();
     private Dictionary<int, ProgressData> progressDict = new Dictionary<int, ProgressData>();
+    private bool sessionSaved = false;
+
 
     private BalloonSpawner balloonSpawner;
 
@@ -228,16 +231,32 @@ public class GameManagerThrishali : MonoBehaviour
     }
     private void SaveSessionData(float overallAccuracy)
     {
-        int sessionID = PlayerPrefs.GetInt("SessionID", 0) + 1;
-        PlayerPrefs.SetInt("SessionID", sessionID);
+        string filePath = Application.persistentDataPath + "/sessions.json";
 
-        string sessionKey = $"Session_{sessionID}";
-        string sessionData = $"{sessionID},{System.DateTime.Now.ToString("yyyy-MM-dd")},{overallAccuracy:F1}";
-        PlayerPrefs.SetString(sessionKey, sessionData);
+        // Load existing session data if file exists
+        SessionDataList sessionDataList = new SessionDataList();
+        if (File.Exists(filePath))
+        {
+            string json = File.ReadAllText(filePath);
+            sessionDataList = JsonUtility.FromJson<SessionDataList>(json);
+        }
 
-        //PlayerPrefs.DeleteAll(); // Clears all saved PlayerPrefs
-       
-        PlayerPrefs.Save();
+        // Create new session entry
+        SessionData newSession = new SessionData
+        {
+            sessionID = sessionDataList.sessions.Count + 1,
+            date = System.DateTime.Now.ToString("yyyy-MM-dd"),
+            accuracy = overallAccuracy
+        };
+
+        // Add to session list (Keep all past sessions)
+        sessionDataList.sessions.Add(newSession);
+
+        // Save back to JSON file
+        string updatedJson = JsonUtility.ToJson(sessionDataList, true);
+        File.WriteAllText(filePath, updatedJson);
+
+        Debug.Log("Session saved: " + updatedJson);
     }
 
     public void ShowProgressDetails()
@@ -294,20 +313,39 @@ public class GameManagerThrishali : MonoBehaviour
             overallTexts[2].color = Color.yellow;
         }
 
-        // Save session accuracy
-        SaveSessionData(overallAccuracy);
+        // Save session accuracy only if it hasn't been saved
+        if (!sessionSaved)
+        {
+            SaveSessionData(overallAccuracy);
+            sessionSaved = true;
+        }
 
         // Display past session records
         ShowRecentSessions();
     }
     private void ShowRecentSessions()
     {
-        int sessionID = PlayerPrefs.GetInt("SessionID", 0);
+        string filePath = Application.persistentDataPath + "/sessions.json";
+
+        if (!File.Exists(filePath))
+        {
+            Debug.Log("No session data found.");
+            return;
+        }
+
+        // Load session data from file
+        string json = File.ReadAllText(filePath);
+        SessionDataList sessionDataList = JsonUtility.FromJson<SessionDataList>(json);
+
+        if (sessionDataList.sessions.Count == 0)
+        {
+            Debug.Log("No session data to display.");
+            return;
+        }
 
         // Add a separator row for clarity
         GameObject separatorRow = Instantiate(rowPrefab, rowContainer);
         separatorRow.SetActive(true);
-
         TMP_Text[] separatorTexts = separatorRow.GetComponentsInChildren<TMP_Text>();
         if (separatorTexts.Length >= 3)
         {
@@ -316,30 +354,26 @@ public class GameManagerThrishali : MonoBehaviour
             separatorTexts[2].text = "Accuracy";
         }
 
-        // Display recent sessions
-        for (int i = sessionID; i > 0 && i > sessionID - 5; i--) // Show last 5 sessions
+        // Display the last 5 sessions (or less if there aren't 5)
+        int count = Mathf.Min(5, sessionDataList.sessions.Count);
+        List<SessionData> latestSessions = sessionDataList.sessions.GetRange(sessionDataList.sessions.Count - count, count);
+
+        foreach (SessionData session in latestSessions)
         {
-            string sessionKey = $"Session_{i}";
-            if (PlayerPrefs.HasKey(sessionKey))
+            GameObject row = Instantiate(rowPrefab, rowContainer);
+            row.SetActive(true);
+
+            TMP_Text[] texts = row.GetComponentsInChildren<TMP_Text>();
+            if (texts.Length >= 3)
             {
-                string[] sessionData = PlayerPrefs.GetString(sessionKey).Split(',');
-
-                if (sessionData.Length == 3)
-                {
-                    GameObject row = Instantiate(rowPrefab, rowContainer);
-                    row.SetActive(true);
-
-                    TMP_Text[] texts = row.GetComponentsInChildren<TMP_Text>();
-                    if (texts.Length >= 3)
-                    {
-                        texts[0].text = $"Session ID: {sessionData[0]}";
-                        texts[1].text = sessionData[1]; // Date
-                        texts[2].text = $"{sessionData[2]}%"; // Accuracy
-                    }
-                }
+                texts[0].text = $"Session {session.sessionID}";
+                texts[1].text = session.date;
+                texts[2].text = $"{session.accuracy:F1}%";
             }
         }
     }
+
+
     public void CloseProgressPanel()
     {
         progressPanel.SetActive(false);
@@ -377,5 +411,20 @@ public class ProgressData
         this.accuracy = 100;
     }
 }
+
+[System.Serializable]
+public class SessionData
+{
+    public int sessionID;
+    public string date;
+    public float accuracy;
+}
+
+[System.Serializable]
+public class SessionDataList
+{
+    public List<SessionData> sessions = new List<SessionData>();
+}
+
 
 
