@@ -19,7 +19,7 @@ public class GeminiRAGChat : MonoBehaviour
     [SerializeField] private GameObject aiMessagePrefab;
     [SerializeField] private Transform chatContent; // Assign the Content of the ScrollRect
 
-    private string apiKey = "AIzaSyAkPJLMhT4q74y_-4b_4QWiYHbkF5aD1ao"; // Replace with your Gemini API key
+    private string apiKey = "Gemini-APIkey"; // Replace with your Gemini API key
     private string geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
     private string embeddingUrl = "https://generativelanguage.googleapis.com/v1beta/models/embedding-001:embedContent"; // For vector embeddings
     private List<GeminiMessage> messages;
