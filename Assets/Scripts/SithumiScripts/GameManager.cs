@@ -6,20 +6,18 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
-    public TextMeshProUGUI countdownText;
+    public TextMeshProUGUI countdownText; // We'll keep this reference but not use it
     public LetterSpawner letterSpawner;
     public BasketController basketController;
     public ProgressManager progressManager;
-    public EndGameMenu endGameMenu; // Added reference to end game menu
+    public EndGameMenu endGameMenu;
 
     [Header("Skip Button")]
-    public GameObject skipButtonObject; // Reference to the Skip Button GameObject
+    public GameObject skipButtonObject;
 
-    [Header("Countdown Settings")]
-    public float countdownDuration = 1.0f; // Time each number displays for
-    public AudioSource countdownSound; // Optional sound effect
-    public AudioSource startGameSound; // Optional sound for game start
-    public AudioSource skipSound; // Optional sound for skipping rounds
+    [Header("Audio")]
+    public AudioSource startGameSound; // Sound for game start
+    public AudioSource skipSound; // Sound for skipping rounds
 
     private bool gameActive = false;
 
@@ -39,61 +37,23 @@ public class GameManager : MonoBehaviour
         if (progressManager == null) progressManager = FindObjectOfType<ProgressManager>();
         if (endGameMenu == null) endGameMenu = FindObjectOfType<EndGameMenu>();
 
-        // Disable game systems until countdown finishes
-        if (letterSpawner != null) letterSpawner.enabled = false;
-        if (basketController != null) basketController.enabled = false;
-
-        // Hide skip button during countdown if it exists
-        if (skipButtonObject != null)
-            skipButtonObject.SetActive(false);
-
         // Make sure end menu is hidden at start
         if (endGameMenu != null && endGameMenu.endMenuPanel != null)
             endGameMenu.endMenuPanel.SetActive(false);
 
-        // Start the countdown
-        StartCoroutine(StartCountdown());
-    }
-
-    private IEnumerator StartCountdown()
-    {
-        // Make sure countdown text is visible
+        // Hide countdown text if it exists
         if (countdownText != null)
-        {
-            countdownText.gameObject.SetActive(true);
-
-            // Countdown from 3
-            countdownText.text = " 3";
-            if (countdownSound) countdownSound.Play();
-            yield return new WaitForSeconds(countdownDuration);
-
-            countdownText.text = " 2";
-            if (countdownSound) countdownSound.Play();
-            yield return new WaitForSeconds(countdownDuration);
-
-            countdownText.text = " 1";
-            if (countdownSound) countdownSound.Play();
-            yield return new WaitForSeconds(countdownDuration);
-
-            countdownText.text = "GO!";
-            if (startGameSound) startGameSound.Play();
-            yield return new WaitForSeconds(countdownDuration);
-
-            // Hide countdown text
             countdownText.gameObject.SetActive(false);
-        }
-        else
-        {
-            // If no text component, just wait 3 seconds
-            yield return new WaitForSeconds(3f);
-        }
 
-        // Start the game
+        // Start the game immediately
         StartGame();
     }
 
     public void StartGame()
     {
+        // Play start sound
+        if (startGameSound) startGameSound.Play();
+
         // Enable game systems
         if (letterSpawner != null)
         {
@@ -130,16 +90,12 @@ public class GameManager : MonoBehaviour
         if (progressManager != null)
             progressManager.ResetGame();
 
-        // Hide skip button during countdown
-        if (skipButtonObject != null)
-            skipButtonObject.SetActive(false);
-
         // Hide end menu panel if it's visible
         if (endGameMenu != null && endGameMenu.endMenuPanel != null)
             endGameMenu.endMenuPanel.SetActive(false);
 
-        // Start countdown again
-        StartCoroutine(StartCountdown());
+        // Start the game again immediately
+        StartGame();
     }
 
     // Method to handle skipping a round

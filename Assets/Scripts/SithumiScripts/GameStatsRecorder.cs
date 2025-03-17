@@ -202,19 +202,17 @@ public class GameStatsRecorder : MonoBehaviour
 
     private IEnumerator RestartMonitoring()
     {
-        // Wait for the countdown to finish - use a slightly longer delay to ensure 
-        // the letter spawner has time to generate a new letter
-        yield return new WaitForSeconds(4.5f);
+        // Shorter delay since we removed the countdown
+        yield return new WaitForSeconds(0.5f);
 
         // Wait until the letter spawner has generated a new letter and it's displayed
-        // This addresses the potential race condition
         yield return new WaitUntil(() =>
             letterSpawner != null &&
             letterSpawner.mainLetterText != null &&
             letterSpawner.mainLetterText.text.Length > 0);
 
-        // Make sure to capture the new letter (not the old one)
-        yield return new WaitForSeconds(0.5f); // Additional small delay for safety
+        // Small delay for safety
+        yield return new WaitForSeconds(0.2f);
 
         CaptureCurrentTargetLetter();
 
@@ -247,8 +245,8 @@ public class GameStatsRecorder : MonoBehaviour
     {
         Debug.Log("GameStatsRecorder: Started monitoring game progress");
 
-        // Wait for the game to start (after countdown)
-        yield return new WaitForSeconds(5.0f);
+        // Short delay to ensure everything is initialized
+        yield return new WaitForSeconds(0.5f);
 
         // Capture initial target letter
         CaptureCurrentTargetLetter();
