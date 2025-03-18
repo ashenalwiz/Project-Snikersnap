@@ -2693,6 +2693,7 @@ Material:
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - GLOW_ON
+  - UNDERLAY_ON
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -2740,10 +2741,10 @@ Material:
     - _FaceDilate: 0
     - _FaceUVSpeedX: 0
     - _FaceUVSpeedY: 0
-    - _GlowInner: 0.05
-    - _GlowOffset: 0
-    - _GlowOuter: 0.05
-    - _GlowPower: 0.75
+    - _GlowInner: 0.967
+    - _GlowOffset: 1
+    - _GlowOuter: 0.543
+    - _GlowPower: 0.09
     - _GradientScale: 7
     - _LightAngle: 3.1416
     - _MaskSoftnessX: 0
@@ -2755,7 +2756,7 @@ Material:
     - _PerspectiveFilter: 0.875
     - _Reflectivity: 10
     - _ScaleRatioA: 0.85714287
-    - _ScaleRatioB: 0.6964286
+    - _ScaleRatioB: 0.4513471
     - _ScaleRatioC: 0.6964286
     - _ScaleX: 1
     - _ScaleY: 1
@@ -2780,10 +2781,10 @@ Material:
     m_Colors:
     - _ClipRect: {r: -32767, g: -32767, b: 32767, a: 32767}
     - _EnvMatrixRotation: {r: 0, g: 0, b: 0, a: 0}
-    - _FaceColor: {r: 0.9811321, g: 0.9811321, b: 0.9811321, a: 1}
-    - _GlowColor: {r: 0.4227292, g: 0.48427665, b: 0.25127557, a: 0.5}
+    - _FaceColor: {r: 1, g: 1, b: 1, a: 1}
+    - _GlowColor: {r: 0.89433956, g: 0.8066593, b: 0, a: 0.5}
     - _MaskCoord: {r: 0, g: 0, b: 32767, a: 32767}
-    - _OutlineColor: {r: 0, g: 0, b: 0, a: 1}
+    - _OutlineColor: {r: 1, g: 0, b: 0, a: 1}
     - _ReflectFaceColor: {r: 0, g: 0, b: 0, a: 1}
     - _ReflectOutlineColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}

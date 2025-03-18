@@ -1,4 +1,3 @@
-
 using UnityEngine;
 using TMPro;
 
@@ -8,8 +7,12 @@ public class BasketController : MonoBehaviour
     public Color correctColor = Color.green;
     public Color incorrectColor = Color.red;
     public Color defaultColor = Color.white;
-    private float colorResetTime = 0.5f;
 
+    [Header("Sound Effects")]
+    public AudioSource correctLetterSound; // Sound for catching correct letter
+    public AudioSource incorrectLetterSound; // Sound for catching incorrect letter
+
+    private float colorResetTime = 0.5f;
     private Vector3 offset;
     private bool isDragging = false;
     private float screenWidthInUnits;
@@ -18,6 +21,12 @@ public class BasketController : MonoBehaviour
     {
         float screenHalfWidth = Camera.main.orthographicSize * Screen.width / Screen.height;
         screenWidthInUnits = screenHalfWidth * 2;
+
+        // Optional: Log a warning if sounds are not assigned
+        if (correctLetterSound == null)
+            Debug.LogWarning("Correct letter sound is not assigned!");
+        if (incorrectLetterSound == null)
+            Debug.LogWarning("Incorrect letter sound is not assigned!");
     }
 
     void Update()
@@ -72,11 +81,19 @@ public class BasketController : MonoBehaviour
             {
                 basketRenderer.color = correctColor; // Glow green for correct letter
                 ProgressManager.Instance.UpdateProgress(1); // Increase progress
+
+                // Play correct letter sound
+                if (correctLetterSound != null)
+                    correctLetterSound.Play();
             }
             else
             {
                 basketRenderer.color = incorrectColor; // Glow red for incorrect letter
                 ProgressManager.Instance.UpdateProgress(-1); // Decrease progress
+
+                // Play incorrect letter sound
+                if (incorrectLetterSound != null)
+                    incorrectLetterSound.Play();
             }
 
             Destroy(other.gameObject); // Remove caught letter

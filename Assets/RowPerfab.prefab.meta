@@ -1,6 +1,11 @@
 fileFormatVersion: 2
-guid: 4439e9df1b3f0bb49a35344d402c62ed
+<<<<<<<< HEAD:Assets/RowPerfab.prefab.meta
+guid: a45edcd2358b64f4fa69e06e8064f3f8
 PrefabImporter:
+========
+guid: efc87f9f9b54fa34f9fca832fad3cdfd
+TextScriptImporter:
+>>>>>>>> b7f250811e7a66472d655f5deb01a843ccbe58a1:Assets/GameStats_20250316_130946.json.meta
   externalObjects: {}
   userData: 
   assetBundleName: 
