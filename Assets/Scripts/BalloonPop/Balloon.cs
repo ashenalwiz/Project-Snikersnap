@@ -4,12 +4,12 @@ using System.Collections;
 
 public class Balloon : MonoBehaviour
 {
-    public float speed = 2.5f;
+    public float speed = 3.3f;
     public TMP_Text numberText;
     private int number;
     public BalloonSpawner spawner;
 
-    private bool isMoving = true;
+    private bool isMoving = true; // Controls whether the balloon moves upward
 
     public void SetNumber(int num)
     {
@@ -19,24 +19,23 @@ public class Balloon : MonoBehaviour
             return;
         }
         number = num;
-        numberText.text = num.ToString();
+        numberText.text = num.ToString();   // Update the displayed number
         numberText.transform.localScale = Vector3.one * 0.5f;
     }
 
     void Update()
     {
-        if (isMoving)
+        if (isMoving)    // Move the balloon upward if it's allowed to move
         {
             transform.Translate(Vector2.up * speed * Time.deltaTime);
         }
 
-        if (transform.position.y > 6f)
+        if (transform.position.y > 6f)  // Destroy the balloon if it moves out of the screen and notify the spawner
         {
             spawner?.BalloonDestroyed();
             Destroy(gameObject);
         }
     }
-
     void OnMouseDown()
     {
         if (!gameObject.activeSelf) return;  // Ensure the GameObject is active before proceeding
@@ -60,8 +59,6 @@ public class Balloon : MonoBehaviour
             }
         }
     }
-
-
     IEnumerator ShakeBalloon()
     {
         Vector3 originalPos = transform.position;
@@ -72,7 +69,4 @@ public class Balloon : MonoBehaviour
         }
         transform.position = originalPos;
     }
-
-    public void StopMovement() => isMoving = false;
-    public void ResumeMovement() => isMoving = true;
 }

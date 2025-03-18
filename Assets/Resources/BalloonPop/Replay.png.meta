@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: a859c0cb943610443a9aa89e508280e5
+guid: 7a2939b0eb141d5489abc97662080a5f
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 7124916750591793896
-    second: sky-background_0
+      213: 1237736887526296036
+    second: Replay_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -126,13 +126,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: sky-background_0
+      name: Replay_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 626
-        height: 391
+        x: 42
+        y: 167
+        width: 415
+        height: 165
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 8ea1145090ac0e260800000000000000
-      internalID: 7124916750591793896
+      spriteID: 4e9076234235d2110800000000000000
+      internalID: 1237736887526296036
       vertices: []
       indices: 
       edges: []
@@ -161,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      sky-background_0: 7124916750591793896
+      Replay_0: 1237736887526296036
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
