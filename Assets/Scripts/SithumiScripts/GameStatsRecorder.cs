@@ -15,16 +15,16 @@ public class RoundData
 }
 
 [Serializable]
-public class SessionData
+public class SessionData1
 {
-    public string date;
+    public string Date;
     public List<RoundData> rounds = new List<RoundData>();
 }
 
 [Serializable]
 public class SithumiProgressData
 {
-    public List<SessionData> sessions = new List<SessionData>();
+    public List<SessionData1> sessions = new List<SessionData1>();
 }
 
 public class GameStatsRecorder : MonoBehaviour
@@ -37,7 +37,7 @@ public class GameStatsRecorder : MonoBehaviour
     private EndGameMenu endGameMenu;
 
     // Stats tracking variables
-    private SessionData currentSession = new SessionData();
+    private SessionData1 currentSession = new SessionData1();
     private int currentRound = 1;
     private int correctCatches = 0;
     private int totalCatches = 0;
@@ -83,10 +83,10 @@ public class GameStatsRecorder : MonoBehaviour
             $"EndGameMenu: {endGameMenu != null}");
 
         // Initialize session data with current date
-        currentSession.date = DateTime.Now.ToString("dd-MM-yyyy");
+        currentSession.Date = DateTime.Now.ToString("dd-MM-yyyy");
         // Create a unique session ID based on time
         sessionId = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-        Debug.Log($"GameStatsRecorder: Initialized with date {currentSession.date}, session ID {sessionId}");
+        Debug.Log($"GameStatsRecorder: Initialized with date {currentSession.Date}, session ID {sessionId}");
 
         // Set the save file path using string concatenation
         saveFilePath = Application.persistentDataPath + "/" + PROGRESS_FILENAME;
@@ -194,7 +194,7 @@ public class GameStatsRecorder : MonoBehaviour
         }
 
         // Reset for the new session
-        ResetSessionData();
+        ResetSessionData1();
 
         // Start monitoring the new game after a delay to allow for countdown and letter generation
         StartCoroutine(RestartMonitoring());
@@ -222,11 +222,11 @@ public class GameStatsRecorder : MonoBehaviour
         isRestarting = false;
     }
 
-    private void ResetSessionData()
+    private void ResetSessionData1()
     {
         // Create a new session
-        currentSession = new SessionData();
-        currentSession.date = DateTime.Now.ToString("dd-MM-yyyy");
+        currentSession = new SessionData1();
+        currentSession.Date = DateTime.Now.ToString("dd-MM-yyyy");
         sessionId = DateTime.Now.ToString("yyyyMMdd_HHmmss");
 
         // Reset tracking variables
@@ -468,10 +468,10 @@ public class GameStatsRecorder : MonoBehaviour
 
         for (int i = 0; i < progressData.sessions.Count; i++)
         {
-            SessionData session = progressData.sessions[i];
+            SessionData1 session = progressData.sessions[i];
 
             // If this session is from today, consider it a partial session
-            if (session.date == currentSession.date)
+            if (session.Date == currentSession.Date)
             {
                 // If the current session has more rounds, or the same number of rounds 
                 // (meaning we're updating the same session), mark it for removal
@@ -513,13 +513,13 @@ public class GameStatsRecorder : MonoBehaviour
             else
             {
                 Debug.Log("No existing progress file found, creating new one");
-                progressData.sessions = new List<SessionData>();
+                progressData.sessions = new List<SessionData1>();
             }
         }
         catch (Exception e)
         {
             Debug.LogError($"Error loading existing progress data: {e.Message}");
-            progressData.sessions = new List<SessionData>();
+            progressData.sessions = new List<SessionData1>();
         }
 
         return progressData;
