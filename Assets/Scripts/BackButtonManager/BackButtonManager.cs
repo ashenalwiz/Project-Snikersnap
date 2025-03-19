@@ -5,29 +5,33 @@ using UnityEngine.SceneManagement;
 public class BackButtonManager : MonoBehaviour
 {
     public Button backButton; // Back button in the corner
-    public GameObject confirmationPanel; // The confirmation pop-up
-    public Button yesButton; // Button to confirm going back
-    public Button noButton; // Button to cancel going back
+    public GameObject menuPanel; // Reference to the MenuPanel in your scene
+
+    // Buttons inside the MenuPanel
+    public Button quitYesButton;
+    public Button quitNoButton;
 
     void Start()
     {
-        // Ensure the confirmation panel is hidden at the start
-        confirmationPanel.SetActive(false);
+        // Ensure the menu panel is hidden at start
+        menuPanel.SetActive(false);
 
-        // Add event listeners
-        backButton.onClick.AddListener(ShowConfirmationPanel);
-        yesButton.onClick.AddListener(GoToMainMenu);
-        noButton.onClick.AddListener(CloseConfirmationPanel);
+        // Add event listener to the back button
+        backButton.onClick.AddListener(ShowMenuPanel);
+
+        // Add event listeners to the buttons
+        quitYesButton.onClick.AddListener(GoToMainMenu);
+        quitNoButton.onClick.AddListener(CloseMenuPanel);
     }
 
-    void ShowConfirmationPanel()
+    void ShowMenuPanel()
     {
-        confirmationPanel.SetActive(true); // Show panel when back button is clicked
+        menuPanel.SetActive(true); // Show MenuPanel when back button is clicked
     }
 
-    void CloseConfirmationPanel()
+    void CloseMenuPanel()
     {
-        confirmationPanel.SetActive(false); // Hide panel when "No" is clicked
+        menuPanel.SetActive(false); // Hide MenuPanel when "No" is clicked
     }
 
     void GoToMainMenu()
