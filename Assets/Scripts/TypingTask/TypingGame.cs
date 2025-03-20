@@ -17,7 +17,7 @@ public class WordAttempt
 }
 
 [System.Serializable]
-public class SessionData
+public class SessionData2
 {
     public List<WordAttempt> wordAttempts = new List<WordAttempt>();
 }
@@ -41,7 +41,7 @@ public class TypingGame : MonoBehaviour
     [SerializeField] private string saveFileName = "UserProgress.json";
 
     //----------------New Updates--------------------------
-    private SessionData sessionData = new SessionData();
+    private SessionData2 SessionData2 = new SessionData2();
     private string jsonFilePath;
 
     public GameObject resultPanel;  // UI panel to show stars
@@ -56,17 +56,17 @@ public class TypingGame : MonoBehaviour
     void Start()
     {
         // Initialize session data to avoid null references
-        if (sessionData == null)
+        if (SessionData2 == null)
         {
-            sessionData = new SessionData();
+            SessionData2 = new SessionData2();
         }
         
-        if (sessionData.wordAttempts == null)
+        if (SessionData2.wordAttempts == null)
         {
-            sessionData.wordAttempts = new List<WordAttempt>();
+            SessionData2.wordAttempts = new List<WordAttempt>();
         }
 
-        jsonFilePath = Path.Combine(Application.dataPath, "GameData", saveFileName);
+        jsonFilePath = System.IO.Path.Combine(Application.dataPath, "GameData", saveFileName);
 
         LoadPreviousData();
 
@@ -153,7 +153,7 @@ public class TypingGame : MonoBehaviour
                 skipped = false
             };
 
-            sessionData.wordAttempts.Add(newAttempt);
+            SessionData2.wordAttempts.Add(newAttempt);
             Debug.Log($"Added word attempt: {correctWord}, attempts: {attempts}, correct: true");
             SaveProgressToFile();
             attempts = 0;
@@ -215,7 +215,7 @@ public class TypingGame : MonoBehaviour
             skipped = true
         };
 
-        sessionData.wordAttempts.Add(newAttempt);
+        SessionData2.wordAttempts.Add(newAttempt);
 
         Debug.Log($"Added skipped word: {wordAudioClips[currentWordIndex].name}, attempts: {attempts}");
 
@@ -330,48 +330,48 @@ public class TypingGame : MonoBehaviour
         replayButton.gameObject.SetActive(false); // Hide replay button
 
         // Create a new session data object to avoid carrying over references
-        sessionData = new SessionData();
-        sessionData.wordAttempts = new List<WordAttempt>();
+        SessionData2 = new SessionData2();
+        SessionData2.wordAttempts = new List<WordAttempt>();
 
         PlayWordAudio(); // Start first word again
     }
 
     void SaveProgressToFile()
     {
-        // Check if sessionData is properly initialized
-        if (sessionData == null)
+        // Check if SessionData2 is properly initialized
+        if (SessionData2 == null)
         {
             Debug.LogError("Session data is null! Creating new instance.");
-            sessionData = new SessionData();
+            SessionData2 = new SessionData2();
         }
 
-        if (sessionData.wordAttempts == null)
+        if (SessionData2.wordAttempts == null)
         {
             Debug.LogError("Word attempts list is null! Creating new list.");
-            sessionData.wordAttempts = new List<WordAttempt>();
+            SessionData2.wordAttempts = new List<WordAttempt>();
         }
 
-        Debug.Log($"Attempting to save data. Current session has {sessionData.wordAttempts.Count} attempts");
+        Debug.Log($"Attempting to save data. Current session has {SessionData2.wordAttempts.Count} attempts");
         
         // Log current attempts for debugging
-        foreach (var attempt in sessionData.wordAttempts)
+        foreach (var attempt in SessionData2.wordAttempts)
         {
             Debug.Log($"Current session word: {attempt.word}, Attempts: {attempt.attempts}, Correct: {attempt.correct}, Skipped: {attempt.skipped}");
         }
 
         // Make sure the directory exists
-        string directory = Path.Combine(Application.dataPath, "GameData");
+        string directory = System.IO.Path.Combine(Application.dataPath, "GameData");
         if (!Directory.Exists(directory))
         {
             Directory.CreateDirectory(directory);
             Debug.Log($"Created directory: {directory}");
         }
 
-        string fullPath = Path.Combine(directory, saveFileName);
+        string fullPath =System.IO.Path.Combine(directory, saveFileName);
         Debug.Log($"Target save path: {fullPath}");
 
         // Handle existing data
-        SessionData existingData = new SessionData();
+        SessionData2 existingData = new SessionData2();
         
         if (File.Exists(fullPath))
         {
@@ -382,7 +382,7 @@ public class TypingGame : MonoBehaviour
 
                 if (!string.IsNullOrEmpty(jsonContent))
                 {
-                    existingData = JsonUtility.FromJson<SessionData>(jsonContent);
+                    existingData = JsonUtility.FromJson<SessionData2>(jsonContent);
                     
                     // Safety check for null lists
                     if (existingData.wordAttempts == null)
@@ -394,14 +394,14 @@ public class TypingGame : MonoBehaviour
                 }
                 else
                 {
-                    Debug.LogWarning("Existing file was empty. Using new SessionData instead.");
+                    Debug.LogWarning("Existing file was empty. Using new SessionData2 instead.");
                     existingData.wordAttempts = new List<WordAttempt>();
                 }
             }
             catch (Exception ex)
             {
                 Debug.LogWarning($"Error loading existing data: {ex.Message}. Starting with fresh data.");
-                existingData = new SessionData();
+                existingData = new SessionData2();
                 existingData.wordAttempts = new List<WordAttempt>();
             }
         }
@@ -417,14 +417,14 @@ public class TypingGame : MonoBehaviour
             existingData.wordAttempts = new List<WordAttempt>();
         }
         
-        if (sessionData.wordAttempts == null)
+        if (SessionData2.wordAttempts == null)
         {
-            sessionData.wordAttempts = new List<WordAttempt>();
+            SessionData2.wordAttempts = new List<WordAttempt>();
         }
 
         // Make a deep copy of the current session data to avoid reference issues
         List<WordAttempt> currentSessionCopy = new List<WordAttempt>();
-        foreach (var attempt in sessionData.wordAttempts)
+        foreach (var attempt in SessionData2.wordAttempts)
         {
             WordAttempt copy = new WordAttempt
             {
@@ -487,8 +487,8 @@ public class TypingGame : MonoBehaviour
             }
 
             // Only clear the session data if the save was successful
-            sessionData = new SessionData();
-            sessionData.wordAttempts = new List<WordAttempt>();
+            SessionData2 = new SessionData2();
+            SessionData2.wordAttempts = new List<WordAttempt>();
         }
         catch (Exception ex)
         {
@@ -498,8 +498,8 @@ public class TypingGame : MonoBehaviour
 
     void LoadPreviousData()
     {
-        string directory = Path.Combine(Application.dataPath, "GameData");
-        string fullPath = Path.Combine(directory, saveFileName);
+        string directory = System.IO.Path.Combine(Application.dataPath, "GameData");
+        string fullPath = System.IO.Path.Combine(directory, saveFileName);
         if (File.Exists(fullPath))
         {
             try
@@ -507,26 +507,26 @@ public class TypingGame : MonoBehaviour
                 string jsonData = File.ReadAllText(fullPath);
                 if (!string.IsNullOrEmpty(jsonData))
                 {
-                    SessionData loadedData = JsonUtility.FromJson<SessionData>(jsonData);
+                    SessionData2 loadedData = JsonUtility.FromJson<SessionData2>(jsonData);
                     Debug.Log($"Loaded previous data with {loadedData.wordAttempts.Count} word attempts");
 
                     // Initialize a new session data for this gameplay session
-                    sessionData = new SessionData();
-                    sessionData.wordAttempts = new List<WordAttempt>();
+                    SessionData2 = new SessionData2();
+                    SessionData2.wordAttempts = new List<WordAttempt>();
                 }
             }
             catch (Exception ex)
             {
                 Debug.LogError($"Error loading previous data: {ex.Message}");
-                sessionData = new SessionData();
-                sessionData.wordAttempts = new List<WordAttempt>();
+                SessionData2 = new SessionData2();
+                SessionData2.wordAttempts = new List<WordAttempt>();
             }
         }
         else
         {
             Debug.Log($"No previous save file found at {fullPath}");
-            sessionData = new SessionData();
-            sessionData.wordAttempts = new List<WordAttempt>();
+            SessionData2 = new SessionData2();
+            SessionData2.wordAttempts = new List<WordAttempt>();
         }
     }
 
@@ -534,7 +534,7 @@ public class TypingGame : MonoBehaviour
     {
         public static string GetFilePath(string fileName)
         {
-            return Path.Combine(Application.persistentDataPath, fileName);
+            return System.IO.Path.Combine(Application.persistentDataPath, fileName);
         }
 
         public static void SaveToJSON<T>(T data, string fileName)
@@ -544,7 +544,7 @@ public class TypingGame : MonoBehaviour
 
             try
             {
-                string directory = Path.GetDirectoryName(filePath);
+                string directory = System.IO.Path.GetDirectoryName(filePath);
                 if (!Directory.Exists(directory) && !string.IsNullOrEmpty(directory))
                 {
                     Directory.CreateDirectory(directory);
