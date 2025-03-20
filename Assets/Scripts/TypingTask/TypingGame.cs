@@ -29,9 +29,13 @@ public class TypingGame : MonoBehaviour
     public Button checkButton;
     public TMP_Text feedbackText;
     public AudioSource audioSource;
+    public AudioClip okSound;
+    public AudioClip wrongSound;
+    public AudioClip skipedSound;
+    public AudioClip victoryEndSound;
     public AudioClip[] wordAudioClips; // Array to hold 5 audio clips
     private string[] words = { "Rock", "Cave", "Flag", "Dark", "Shark", "Cat", "Cup", "Nap", "Hello", "Yellow", "Lava", "Jump", "Run" }; // List of words
-    private int currentWordIndex = 0; // Track current word
+    private int currentWordIndex = 0;  // Track current word
     public UnityEngine.UI.Image hintImage;
     public Button skipButton;
     private Dictionary<string, Sprite> wordImageMap;
@@ -144,6 +148,7 @@ public class TypingGame : MonoBehaviour
             feedbackText.text = "Correct!";
             correctAnswers++;
             attempts++;
+            audioSource.PlayOneShot(okSound);
 
             WordAttempt newAttempt = new WordAttempt
             {
@@ -167,6 +172,7 @@ public class TypingGame : MonoBehaviour
         {
             attempts++;
             feedbackText.text = "Let's Try again.";
+            audioSource.PlayOneShot(wrongSound);
 
             //-------Update----------------------------------------------------
             if (attempts == 1)
@@ -206,6 +212,8 @@ public class TypingGame : MonoBehaviour
         feedbackText.text = "Skipped!";
 
         skippedWords++;
+
+        audioSource.PlayOneShot(skipedSound);
 
         WordAttempt newAttempt = new WordAttempt
         {
@@ -247,8 +255,10 @@ public class TypingGame : MonoBehaviour
             CalculateFinalScore();
 
             feedbackText.text = "Task Complete!"; // Show message when all words are completed
-            checkButton.interactable = false; // Disable check button
+            checkButton.interactable = false;
+            // Disable check button
             skipButton.interactable = false;
+            audioSource.PlayOneShot(victoryEndSound);
             SaveProgressToFile();
         }
     }
