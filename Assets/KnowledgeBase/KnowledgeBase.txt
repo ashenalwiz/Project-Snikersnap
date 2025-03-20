@@ -1,0 +1,73 @@
+# READAROO Knowledge Base
+
+## About Dyslexia
+Dyslexia is a learning difference that affects how the brain processes written and sometimes spoken language. It's not related to intelligence. Children with dyslexia often struggle with recognizing and processing individual sounds in words, which makes reading and spelling challenging. Phonological awareness is typically the main area of difficulty.
+
+## Letter Sound Match-Up Game
+The Letter Sound Match-Up game helps children connect the sounds of letters (phonemes) with their visual representations. Players hear a sound and must identify the corresponding letter or letter group. This builds phonological awareness, a critical skill for reading development in dyslexic children.
+
+### Game Instructions
+1. Listen carefully to the sound played
+2. Look at the letter groups on screen
+3. Tap the letter or letter group that makes the sound you heard
+4. Get instant feedback - stars and sounds for correct answers!
+5. Progress through levels with increasing difficulty
+
+### Tips for Parents
+When helping your child with Letter Sound Match-Up, try these approaches:
+- Practice the sounds together before playing
+- Use hand motions associated with letter sounds
+- Celebrate small victories to build confidence
+- If they struggle, model the correct answer and try again
+- Keep sessions short (5-10 minutes) and positive
+
+## Reading Strategies for Dyslexic Children
+- Use multi-sensory learning: combine visual, auditory, and kinesthetic approaches
+- Break words into smaller parts (syllables)
+- Use color-coding for different sounds or syllables
+- Read text with larger fonts and increased spacing
+- Practice regularly in short sessions
+- Use dyslexia-friendly fonts like OpenDyslexic
+
+## Common Dyslexia Signs
+- Difficulty with rhyming words
+- Struggles to connect letters with sounds
+- Reading is slow and laborious
+- Makes consistent spelling errors
+- Avoids reading activities
+- May reverse letters or numbers when writing
+- Has excellent reasoning and creative thinking abilities
+
+## READAROO Mini-Games
+
+### Word Builder
+Players construct words by selecting letter blocks and placing them in the correct order. Features color-coded consonants and vowels to reinforce patterns.
+
+### Rhyme Time
+Players identify words that rhyme by matching picture cards. Builds phonological awareness through recognizing similar-sounding word endings.
+
+### Syllable Split
+Players break down longer words into syllables by clapping or tapping as they hear each syllable, then dragging word parts to match the rhythm.
+
+### Sight Word Safari
+Players practice high-frequency words through quick recognition activities. Focuses on common words that don't follow typical phonetic patterns.
+
+### Story Creator
+Players arrange sentence parts to create logical stories, building comprehension and grammar skills while reinforcing reading confidence.
+
+## Encouraging a Growth Mindset
+- Emphasize effort over results: "I love how hard you're trying!"
+- Normalize mistakes: "Mistakes help your brain grow stronger!"
+- Celebrate progress: "You're reading more words than last week!"
+- Use positive language: "This is challenging, but you can figure it out!"
+- Build on strengths: "Your creative thinking helps you solve problems!"
+
+## Accessible Features in READAROO
+- Adjustable text size
+- Dyslexia-friendly font options
+- High contrast mode
+- Audio instructions and feedback
+- Progress tracking
+- Personalized difficulty levels
+- Text-to-speech support
+- Simplified interface options
