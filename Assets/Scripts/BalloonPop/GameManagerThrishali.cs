@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.IO;
+using System.Linq;
 
 public class GameManagerThrishali : MonoBehaviour
 {
@@ -16,6 +17,7 @@ public class GameManagerThrishali : MonoBehaviour
     public GameObject progressPanel, rowPrefab, headerRow;
     public Transform rowContainer; 
     public GameObject backButton;
+
 
     private int remainingChances = 5, score = 0;
     private List<int> availableNumbers = new(), missedNumbers = new();
@@ -33,8 +35,9 @@ public class GameManagerThrishali : MonoBehaviour
 
 
     private BalloonSpawner balloonSpawner;
-
     
+
+
     private void Start()
     {
         progressPanel.SetActive(false);
@@ -208,7 +211,7 @@ public class GameManagerThrishali : MonoBehaviour
     
     {
         
-        gameOverText.text = $"Congratulations!\nYou earned {score} Points";
+        gameOverText.text = $"Congratulations!";
         gameOverText.gameObject.SetActive(true);
         audioSource.PlayOneShot(gameOverSound);
         ShowEndGameButtons();
@@ -286,6 +289,7 @@ public class GameManagerThrishali : MonoBehaviour
             TMP_Text[] texts = row.GetComponentsInChildren<TMP_Text>();
             if (texts.Length >= 3)
             {
+
                 texts[0].text = number.ToString();
                 texts[1].text = data.attempts.ToString();
                 texts[2].text = $"{data.accuracy:F1}%";
@@ -356,7 +360,9 @@ public class GameManagerThrishali : MonoBehaviour
 
         // Display the last 5 sessions (or less if there aren't 5)
         int count = Mathf.Min(5, sessionDataList.sessions.Count);
-        List<SessionData> latestSessions = sessionDataList.sessions.GetRange(sessionDataList.sessions.Count - count, count);
+        //List<SessionData> latestSessions = sessionDataList.sessions.GetRange(sessionDataList.sessions.Count - count, count);
+        List<SessionData> latestSessions = sessionDataList.sessions.GetRange(sessionDataList.sessions.Count - count, count)
+        .OrderByDescending(s => s.sessionID).ToList();
 
         foreach (SessionData session in latestSessions)
         {

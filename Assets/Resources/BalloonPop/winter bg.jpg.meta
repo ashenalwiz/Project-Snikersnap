@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: ed3e123cd438ce242823253defc20d4a
+guid: f2a02eea93058ec44b250797c3ee9a2e
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1479643841123055924
-    second: Balloon1_0
+      213: -8827556838875194116
+    second: istockphoto-1436347531-612x612_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -126,13 +126,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Balloon1_0
+      name: istockphoto-1436347531-612x612_0
       rect:
         serializedVersion: 2
-        x: 134
-        y: 23
-        width: 232
-        height: 415
+        x: 0
+        y: 0
+        width: 612
+        height: 411
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 439fb38eb30c88410800000000000000
-      internalID: 1479643841123055924
+      spriteID: cfc164053d73e7580800000000000000
+      internalID: -8827556838875194116
       vertices: []
       indices: 
       edges: []
@@ -161,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Balloon1_0: 1479643841123055924
+      istockphoto-1436347531-612x612_0: -8827556838875194116
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
