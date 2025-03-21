@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2630620101406850225}
   - component: {fileID: 6100923171439646348}
   - component: {fileID: 5264633730064056095}
+  - component: {fileID: 7042816290976317231}
   m_Layer: 5
   m_Name: Item_ImageBased
   m_TagString: Untagged
@@ -120,7 +121,34 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 6100923171439646348}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 7042816290976317231}
+        m_TargetAssemblyTypeName: TracingScripts.ButtonHandler, Assembly-CSharp
+        m_MethodName: GoToTracingMainGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &7042816290976317231
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7201183480175241856}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce5cb9bf93465cf47a586cdda7f6fc64, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  myItemToTace: 
+  isNextScene: 0
+  isPrevScene: 0
 --- !u!1 &8864022804650529884
 GameObject:
   m_ObjectHideFlags: 0
