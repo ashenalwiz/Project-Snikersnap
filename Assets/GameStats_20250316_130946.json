@@ -1,0 +1,12 @@
+{
+    "date": "16-03-2025",
+    "rounds": [
+        {
+            "round": 1,
+            "targetLetter": "S-s",
+            "accuracy": 100.0,
+            "attempts": 5,
+            "skipped": false
+        }
+    ]
+}
