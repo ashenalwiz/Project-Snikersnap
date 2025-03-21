@@ -4,6 +4,8 @@ using Firebase;
 using Firebase.Auth;
 using TMPro;
 using Unity.VisualScripting;
+using UnityEngine.UI;
+using static UnityEngine.Rendering.VirtualTexturing.Debugging;
 
 public class FirebaseManager : MonoBehaviour
 {
@@ -21,7 +23,36 @@ public class FirebaseManager : MonoBehaviour
     private TMP_InputField loginPassword;
     [SerializeField]
     private TMP_Text loginOutputText;
+    [SerializeField]
+    private Toggle rememberMeToggle;
     [Space(5f)]
+
+    [Header("Password Reset")]
+    [SerializeField]
+    private GameObject passwordResetUI; 
+    [SerializeField]
+    private TMP_InputField resetEmailField;
+    [SerializeField]
+    private TMP_Text resetEmailOutput;
+    [Space(5f)]
+
+    [Header("User Profile")]
+    [SerializeField]
+    private TMP_InputField updateUsernameField;
+    [SerializeField]
+    private TMP_InputField updatePasswordField;
+    [SerializeField]
+    private TMP_InputField confirmUpdatePasswordField;
+    [SerializeField]
+    private TMP_Text profileUpdateOutput;
+    [Space(5f)]
+
+    [Header("Loading")]
+    [SerializeField]
+    private GameObject loadingPanel;
+
+    // for persistent login
+    private const string RememberMeKey = "FirebaseRememberMe";
 
     [Header("Register References")]
     [SerializeField]
@@ -47,29 +78,336 @@ public class FirebaseManager : MonoBehaviour
             Destroy(instance.gameObject);
             instance = this;
         }
+    }
 
-        FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(checkDependencyTask =>
+    private void Start()
+    {
+        StartCoroutine(CheckAndFixDependancies());
+    }
+
+    // Add these new methods for password reset
+    public void OpenPasswordResetUI()
+    {
+        AuthUIManager.instance.PasswordResetScreen();
+    }
+    public void PasswordResetButton()
+    {
+        StartCoroutine(SendPasswordResetEmail(resetEmailField.text));
+    }
+
+    private IEnumerator SendPasswordResetEmail(string email)
+    {
+        // Show loading indicator
+        ShowLoading(true);
+
+        // Validate email format
+        if (!IsValidEmail(email))
         {
-            var dependencyStatus = checkDependencyTask.Result;
+            resetEmailOutput.text = "Please enter a valid email address";
+            ShowLoading(false);
+            yield break;
+        }
 
-            if (dependencyStatus == DependencyStatus.Available)
+        var resetTask = auth.SendPasswordResetEmailAsync(email);
+        yield return new WaitUntil(() => resetTask.IsCompleted);
+
+        ShowLoading(false);
+
+        if (resetTask.Exception != null)
+        {
+            FirebaseException firebaseException = (FirebaseException)resetTask.Exception.GetBaseException();
+            AuthError error = (AuthError)firebaseException.ErrorCode;
+            string output = "Unknown Error, Please try again";
+
+            switch (error)
             {
-                InitializeFirebase();
+                case AuthError.InvalidEmail:
+                    output = "Invalid Email";
+                    break;
+                case AuthError.UserNotFound:
+                    output = "User Not Found";
+                    break;
+                case AuthError.TooManyRequests:
+                    output = "Too Many Requests, Try Later";
+                    break;
+            }
+
+            resetEmailOutput.text = output;
+        }
+        else
+        {
+            resetEmailOutput.text = "Password reset email sent!";
+            StartCoroutine(ReturnToLoginAfterDelay(3f));
+        }
+    }
+
+    private IEnumerator ReturnToLoginAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        AuthUIManager.instance.LoginScreen();
+    }
+
+    // 3. Add logout functionality
+    public void LogoutUser()
+    {
+        StartCoroutine(LogoutLogic());
+    }
+
+    private IEnumerator LogoutLogic()
+    {
+        ShowLoading(true);
+
+        // Clear remember me preference
+        PlayerPrefs.SetInt(RememberMeKey, 0);
+        PlayerPrefs.Save();
+
+        auth.SignOut();
+
+        // Wait for auth state to update
+        yield return new WaitForSeconds(0.5f);
+
+        ShowLoading(false);
+        AuthUIManager.instance.LoginScreen();
+    }
+
+    // 4. Add profile management
+    public void UpdateProfileButton()
+    {
+        StartCoroutine(UpdateProfileLogic());
+    }
+
+    private IEnumerator UpdateProfileLogic()
+    {
+        ShowLoading(true);
+
+        // If user is trying to update username
+        if (!string.IsNullOrEmpty(updateUsernameField.text))
+        {
+            UserProfile profile = new UserProfile
+            {
+                DisplayName = updateUsernameField.text
+            };
+
+            var updateTask = user.UpdateUserProfileAsync(profile);
+            yield return new WaitUntil(() => updateTask.IsCompleted);
+
+            if (updateTask.Exception != null)
+            {
+                profileUpdateOutput.text = "Failed to update username.";
+                ShowLoading(false);
+                yield break;
             }
             else
             {
-                Debug.LogError($"Could not resolve all Firebase dependencies: {dependencyStatus}");
+                profileUpdateOutput.text = "Username updated successfully!";
             }
-        });
+        }
 
+        // If user is trying to update password
+        if (!string.IsNullOrEmpty(updatePasswordField.text))
+        {
+            // Validate password
+            if (updatePasswordField.text.Length < 6)
+            {
+                profileUpdateOutput.text = "Password must be at least 6 characters.";
+                ShowLoading(false);
+                yield break;
+            }
+
+            // Check if passwords match
+            if (updatePasswordField.text != confirmUpdatePasswordField.text)
+            {
+                profileUpdateOutput.text = "Passwords do not match.";
+                ShowLoading(false);
+                yield break;
+            }
+
+            var passwordTask = user.UpdatePasswordAsync(updatePasswordField.text);
+            yield return new WaitUntil(() => passwordTask.IsCompleted);
+
+            if (passwordTask.Exception != null)
+            {
+                FirebaseException firebaseException = (FirebaseException)passwordTask.Exception.GetBaseException();
+                AuthError error = (AuthError)firebaseException.ErrorCode;
+
+                switch (error)
+                {
+                    case AuthError.WeakPassword:
+                        profileUpdateOutput.text = "Password is too weak.";
+                        break;
+                    case AuthError.RequiresRecentLogin:
+                        profileUpdateOutput.text = "Please re-authenticate to change password.";
+                        StartCoroutine(ReauthenticateUser());
+                        break;
+                    default:
+                        profileUpdateOutput.text = "Failed to update password.";
+                        break;
+                }
+            }
+            else
+            {
+                profileUpdateOutput.text = "Password updated successfully!";
+            }
+        }
+
+        ShowLoading(false);
+    }
+
+    // 5. Handle Remember Me functionality
+    private void UpdateRememberMePreference(bool remember)
+    {
+        PlayerPrefs.SetInt(RememberMeKey, remember ? 1 : 0);
+        PlayerPrefs.Save();
+    }
+
+    public void RememberMeToggleChanged()
+    {
+        UpdateRememberMePreference(rememberMeToggle.isOn);
+    }
+
+    // 6. Add reauthentication for sensitive operations
+    private IEnumerator ReauthenticateUser()
+    {
+        // This would typically open a new dialog asking for credentials
+        // For now, we'll just redirect to login
+        LogoutUser();
+        yield return new WaitForSeconds(0.5f);
+        loginOutputText.text = "Please login again to continue";
+    }
+
+    // 7. Account deletion functionality
+    public void DeleteAccountButton()
+    {
+        StartCoroutine(DeleteAccountLogic());
+    }
+
+    private IEnumerator DeleteAccountLogic()
+    {
+        ShowLoading(true);
+
+        if (user != null)
+        {
+            var deleteTask = user.DeleteAsync();
+            yield return new WaitUntil(() => deleteTask.IsCompleted);
+
+            if (deleteTask.Exception != null)
+            {
+                FirebaseException firebaseException = (FirebaseException)deleteTask.Exception.GetBaseException();
+                AuthError error = (AuthError)firebaseException.ErrorCode;
+
+                string output = "Failed to delete account.";
+
+                switch (error)
+                {
+                    case AuthError.RequiresRecentLogin:
+                        output = "Please re-authenticate to delete your account.";
+                        StartCoroutine(ReauthenticateUser());
+                        break;
+                }
+
+                loginOutputText.text = output;
+            }
+            else
+            {
+                loginOutputText.text = "Account deleted successfully.";
+                AuthUIManager.instance.LoginScreen();
+            }
+        }
+
+        ShowLoading(false);
+    }
+
+    // 8. Enhanced validation methods
+    private bool IsValidEmail(string email)
+    {
+        // Basic email validation
+        if (string.IsNullOrEmpty(email))
+            return false;
+
+        // Use regex or simple check for @ and .
+        return email.Contains("@") && email.Contains(".");
+    }
+
+    private bool IsPasswordStrong(string password)
+    {
+        if (string.IsNullOrEmpty(password) || password.Length < 6)
+            return false;
+
+        // Add more complex checks if desired
+        // e.g., require numbers, special chars, etc.
+        return true;
+    }
+
+    // 9. Utility methods
+    private void ShowLoading(bool isLoading)
+    {
+        if (loadingPanel != null)
+            loadingPanel.SetActive(isLoading);
+    }
+
+    private IEnumerator CheckAndFixDependancies()
+    {
+        var checkAndFixDependenciesTask = FirebaseApp.CheckAndFixDependenciesAsync();
+        yield return new WaitUntil(predicate: () => checkAndFixDependenciesTask.IsCompleted);
+
+        var dependancyResult = checkAndFixDependenciesTask.Result;
+
+        if (dependancyResult == DependencyStatus.Available)
+        {
+            InitializeFirebase();
+        }
+        else
+        {
+            Debug.LogError($"Could not resolve all Firebase dependancies: {dependancyResult}");
+        }
     }
 
     private void InitializeFirebase()
     {
         auth = FirebaseAuth.DefaultInstance;
+        StartCoroutine(CheckAutoLogin());
 
         auth.StateChanged += AuthStateChanged;
         AuthStateChanged(this, null);
+
+    }
+
+    private IEnumerator CheckAutoLogin()
+    {
+        yield return new WaitForEndOfFrame();
+        if (user != null)
+        {
+            var reloadUserTask = user.ReloadAsync();
+            yield return new WaitUntil(predicate: () => reloadUserTask.IsCompleted);
+            AutoLogin();
+        }
+        else
+        {
+            AuthUIManager.instance.LoginScreen();
+        }
+
+    }
+
+    private void AutoLogin()
+    {
+        if (user != null)
+        {
+            if (user.IsEmailVerified)
+            {
+                // Initialize user data here, after user is verified
+                UserProfileManager.instance.InitializeUserData(user);
+                FirebaseGameManager.instance.ChangeScene(1);
+            }
+            else
+            {
+                StartCoroutine(sendVerificationEmail());
+            }
+        }
+
+        else
+        {
+            AuthUIManager.instance.LoginScreen();
+        }
 
     }
 
@@ -109,21 +447,35 @@ public class FirebaseManager : MonoBehaviour
         StartCoroutine(registerLogic(registerUsername.text, RegisterEmail.text, RegisterPassword.text, RegisterConfirmPassword.text));
     }
 
+    // Update login method to handle Remember Me
     private IEnumerator loginLogic(string email, string password)
     {
+        // Show loading indicator
+        ShowLoading(true);
+
+        // Validate inputs
+        if (!IsValidEmail(email))
+        {
+            loginOutputText.text = "Please enter a valid email address";
+            ShowLoading(false);
+            yield break;
+        }
+
         Credential credential = EmailAuthProvider.GetCredential(email, password);
 
         var loginTask = auth.SignInWithCredentialAsync(credential);
 
         yield return new WaitUntil(predicate: () => loginTask.IsCompleted);
 
+        ShowLoading(false);
+
         if (loginTask.Exception != null)
         {
             FirebaseException firebaseException = (FirebaseException)loginTask.Exception.GetBaseException();
-            AuthError error = (AuthError) firebaseException.ErrorCode;
+            AuthError error = (AuthError)firebaseException.ErrorCode;
             string output = "Unknown Error, Please try again";
 
-            switch(error)
+            switch (error)
             {
                 case AuthError.MissingEmail:
                     output = "Please Enter your Email";
@@ -140,36 +492,61 @@ public class FirebaseManager : MonoBehaviour
                 case AuthError.UserNotFound:
                     output = "Account Does Not Exist";
                     break;
+                case AuthError.UserDisabled:
+                    output = "Account has been disabled";
+                    break;
+                case AuthError.TooManyRequests:
+                    output = "Too many login attempts, try again later";
+                    break;
             }
             loginOutputText.text = output;
         }
         else
         {
+            // Save remember me preference
+            UpdateRememberMePreference(rememberMeToggle.isOn);
+
             if (user.IsEmailVerified)
             {
+                // Initialize user data
+                UserProfileManager.instance.InitializeUserData(user);
                 yield return new WaitForSeconds(1f);
                 FirebaseGameManager.instance.ChangeScene(1);
-
             }
             else
             {
-                //TODO: send verification email
-
-                //Temporary
-                FirebaseGameManager.instance.ChangeScene(1);
+                StartCoroutine(sendVerificationEmail());
             }
         }
     }
 
     private IEnumerator registerLogic(string _username, string _email,  string _password, string _confirmPassword)
     {
-        if (_username == "")
+        ShowLoading(true);
+
+        if (string.IsNullOrEmpty(_username) || _username.Length < 3)
         {
-            registerOutputText.text = "Please Enter A Username";
+            registerOutputText.text = "Username must be at least 3 characters";
+            ShowLoading(false);
+            yield break;
+        }
+        else if (!IsValidEmail(_email))
+        {
+            registerOutputText.text = "Please enter a valid email address";
+            ShowLoading(false);
+            yield break;
+        }
+        else if (!IsPasswordStrong(_password))
+        {
+            registerOutputText.text = "Password must be at least 6 characters";
+            ShowLoading(false);
+            yield break;
         }
         else if (_password != _confirmPassword)
         {
             registerOutputText.text = "Passwords Do Not Match";
+            ShowLoading(false);
+            yield break;
         }
         else
         {
@@ -201,6 +578,7 @@ public class FirebaseManager : MonoBehaviour
                         break;
                 }
                 registerOutputText.text = output;
+                ShowLoading(false);
             }
             else
             {
@@ -235,7 +613,49 @@ public class FirebaseManager : MonoBehaviour
                 else
                 {
                     Debug.Log($"Firebase User Created Successfully: {user.DisplayName} ({user.UserId})");
+
+                    StartCoroutine(sendVerificationEmail());
                 }
+                ShowLoading(false);
+            }
+        }
+    }
+
+    private IEnumerator sendVerificationEmail()
+    {
+        if (user != null)
+        {
+            var emailTask = user.SendEmailVerificationAsync();
+            yield return new WaitUntil(predicate: () => emailTask.IsCompleted);
+
+            if (emailTask.Exception != null)
+            {
+                FirebaseException firebaseException = (FirebaseException)emailTask.Exception.GetBaseException();
+                AuthError error = (AuthError)firebaseException.ErrorCode;
+
+                string output = "Unknown Error, Try Again!";
+
+                switch (error)
+                {
+                    case AuthError.Cancelled:
+                        output = "Verification Task was Cancelled";
+                        break;
+                    case AuthError.InvalidRecipientEmail:
+                        output = "Invalid Email";
+                        break;
+                    case AuthError.TooManyRequests:
+                        output = "Too Many Requests";
+                        break;
+                }
+
+                AuthUIManager.instance.AwaitVerification(false, user.Email, output);
+
+            }
+
+            else
+            {
+                AuthUIManager.instance.AwaitVerification(true, user.Email, null);
+                Debug.Log("Email Send Successfully");
             }
         }
     }

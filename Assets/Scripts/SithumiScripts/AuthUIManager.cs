@@ -15,6 +15,12 @@ public class AuthUIManager : MonoBehaviour
     [SerializeField]
     private GameObject verifyEmailUI;
     [SerializeField]
+    private GameObject passwordResetUI; 
+    [SerializeField]
+    private GameObject profileUI; 
+    [SerializeField]
+    private GameObject loadingUI;
+    [SerializeField]
     private TMP_Text verifyEmailText;
 
     public void Awake()
@@ -34,6 +40,32 @@ public class AuthUIManager : MonoBehaviour
         loginUI.SetActive(false);
         registerUI.SetActive(false);
         FirebaseManager.instance.ClearOutputs();
+        verifyEmailUI.SetActive(false);
+        passwordResetUI.SetActive(false); 
+        profileUI.SetActive(false);
+        loadingUI.SetActive(false);
+        checkingForAccountUI.SetActive(false);
+    }
+
+    // New: Password Reset Screen
+    public void PasswordResetScreen()
+    {
+        ClearUI();
+        passwordResetUI.SetActive(true);
+    }
+
+    // New: Profile Screen
+    public void ProfileScreen()
+    {
+        ClearUI();
+        profileUI.SetActive(true);
+    }
+
+    // New: Show/Hide Loading Screen
+    public void ShowLoading(bool show)
+    {
+        if (loadingUI != null)
+            loadingUI.SetActive(show);
     }
 
     public void LoginScreen()
@@ -46,5 +78,20 @@ public class AuthUIManager : MonoBehaviour
     {
         ClearUI();
         registerUI.SetActive(true);
+    }
+
+    public void AwaitVerification(bool _emailSent, string _email, string _output)
+    {
+        ClearUI();
+        verifyEmailUI.SetActive(true);
+
+        if (_emailSent)
+        {
+            verifyEmailText.text = $"Sent Email!\nPlease Verify {_email}";
+        }
+        else
+        {
+            verifyEmailText.text = $"Email Not Sent: {_output}\nPlease Verify {_email}";
+        }
     }
 }
