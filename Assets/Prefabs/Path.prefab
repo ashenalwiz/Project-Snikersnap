@@ -48,8 +48,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   path:
-    points: []
+    points:
+    - {x: -1, y: 0}
+    - {x: -0.35, y: 0}
+    - {x: 0.35, y: 0}
+    - {x: 1, y: 0}
   MyCurrentNumber: 0
+  pointsDistance: []
+  isCicrcle: 0
 --- !u!120 &5547272910650924045
 LineRenderer:
   serializedVersion: 2
