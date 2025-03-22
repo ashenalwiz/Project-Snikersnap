@@ -61,6 +61,11 @@ public class FirebaseManager : MonoBehaviour
     [SerializeField]
     private TMP_Text registerOutputText;
 
+    // Store registration info for potential "Remember Me" after verification
+    private string lastRegisteredEmail;
+    private string lastRegisteredPassword;
+    private bool shouldRememberAfterRegistration = false;
+
     public void Awake()
     {
         DontDestroyOnLoad(gameObject);
@@ -183,9 +188,10 @@ public class FirebaseManager : MonoBehaviour
         PlayerPrefs.Save();
     }
 
-    public void RememberMeToggleChanged()
+    // Public method to check the current Remember Me toggle state
+    public bool IsRememberMeEnabled()
     {
-        // This is now handled during login
+        return rememberMeToggle != null && rememberMeToggle.isOn;
     }
 
     // Public method to resend verification email
@@ -232,6 +238,20 @@ public class FirebaseManager : MonoBehaviour
                 if (user.IsEmailVerified)
                 {
                     Debug.Log("Email verified! Proceeding to game.");
+
+                    // Handle Remember Me preference for newly registered users
+                    if (shouldRememberAfterRegistration &&
+                        !string.IsNullOrEmpty(lastRegisteredEmail) &&
+                        !string.IsNullOrEmpty(lastRegisteredPassword))
+                    {
+                        SaveCredentials(lastRegisteredEmail, lastRegisteredPassword);
+                    }
+                    else
+                    {
+                        // Clear credentials if Remember Me is not checked
+                        ClearSavedCredentials();
+                    }
+
                     FirebaseGameManager.instance.ChangeScene(1);
                     yield break;
                 }
@@ -329,9 +349,9 @@ public class FirebaseManager : MonoBehaviour
         else if (user != null)
         {
             // We have a user but Remember Me is not enabled
-            var reloadUserTask = user.ReloadAsync();
-            yield return new WaitUntil(predicate: () => reloadUserTask.IsCompleted);
-            AutoLogin();
+            // So we should log them out to prevent auto-login
+            auth.SignOut();
+            AuthUIManager.instance.LoginScreen();
         }
         else
         {
@@ -343,13 +363,23 @@ public class FirebaseManager : MonoBehaviour
     {
         if (user != null)
         {
-            if (user.IsEmailVerified)
+            // Only auto-login if Remember Me is enabled
+            if (PlayerPrefs.GetInt(RememberMeKey, 0) == 1)
             {
-                FirebaseGameManager.instance.ChangeScene(1);
+                if (user.IsEmailVerified)
+                {
+                    FirebaseGameManager.instance.ChangeScene(1);
+                }
+                else
+                {
+                    StartCoroutine(sendVerificationEmail());
+                }
             }
             else
             {
-                StartCoroutine(sendVerificationEmail());
+                // If Remember Me is not enabled, sign out the user
+                auth.SignOut();
+                AuthUIManager.instance.LoginScreen();
             }
         }
         else
@@ -391,6 +421,8 @@ public class FirebaseManager : MonoBehaviour
 
     public void RegisterButton()
     {
+        // Before registration, check the Remember Me toggle state
+        shouldRememberAfterRegistration = IsRememberMeEnabled();
         StartCoroutine(registerLogic(registerUsername.text, RegisterEmail.text, RegisterPassword.text, RegisterConfirmPassword.text));
     }
 
@@ -502,6 +534,10 @@ public class FirebaseManager : MonoBehaviour
         }
         else
         {
+            // Store the registration info temporarily
+            lastRegisteredEmail = _email;
+            lastRegisteredPassword = _password;
+
             var registerTask = auth.CreateUserWithEmailAndPasswordAsync(_email, _password);
             yield return new WaitUntil(predicate: () => registerTask.IsCompleted);
 
@@ -556,7 +592,7 @@ public class FirebaseManager : MonoBehaviour
                             output = "Update User Cancelled";
                             break;
                         case AuthError.SessionExpired:
-                            output = "Session Expire";
+                            output = "Session Expired";
                             break;
                     }
                     registerOutputText.text = output;
@@ -605,7 +641,7 @@ public class FirebaseManager : MonoBehaviour
                 AuthUIManager.instance.AwaitVerification(true, user.Email, null);
                 // Start checking for verification
                 StartVerificationCheck();
-                Debug.Log("Email Send Successfully");
+                Debug.Log("Email Sent Successfully");
             }
         }
     }
