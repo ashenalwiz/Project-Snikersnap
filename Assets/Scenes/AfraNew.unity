@@ -289,8 +289,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 209.7378, y: 0.0050201}
-  m_SizeDelta: {x: 2467.5156, y: 1536}
+  m_AnchoredPosition: {x: 16.237, y: 38}
+  m_SizeDelta: {x: 3210.3247, y: 1623.4873}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &49592351
 MonoBehaviour:
@@ -312,7 +312,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -5606718777101302656, guid: 321234618ca200f479af109a3aa35f0f, type: 3}
+  m_Sprite: {fileID: 2127515415957489438, guid: b5aca314caedec4468349ddbdb2c8958, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -346,7 +346,7 @@ GameObject:
   - component: {fileID: 101500663}
   - component: {fileID: 101500668}
   m_Layer: 5
-  m_Name: Letter2
+  m_Name: Letter3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -369,8 +369,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 670, y: -274}
-  m_SizeDelta: {x: 256.6716, y: 189.2239}
+  m_AnchoredPosition: {x: 697.8127, y: -478.29}
+  m_SizeDelta: {x: 426.9145, y: 343.51}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &101500663
 MonoBehaviour:
@@ -559,8 +559,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -494, y: 225}
-  m_SizeDelta: {x: 362.8845, y: 246.6086}
+  m_AnchoredPosition: {x: -992, y: 336.57}
+  m_SizeDelta: {x: 693.2588, y: 543.0983}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &218340701
 MonoBehaviour:
@@ -749,7 +749,7 @@ GameObject:
   - component: {fileID: 386241215}
   - component: {fileID: 386241219}
   m_Layer: 5
-  m_Name: Letter3
+  m_Name: Letter2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -913,8 +913,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 128.34, y: -274}
-  m_SizeDelta: {x: 256.6716, y: 189.2239}
+  m_AnchoredPosition: {x: 16.237, y: -475.6355}
+  m_SizeDelta: {x: 463.06, y: 338.1904}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &386241219
 CanvasGroup:
@@ -1147,8 +1147,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -385, y: -274}
-  m_SizeDelta: {x: 256.6716, y: 189.2239}
+  m_AnchoredPosition: {x: -760.1873, y: -468.54}
+  m_SizeDelta: {x: 455.2939, y: 324.01}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1191835375
 MonoBehaviour:
@@ -1761,7 +1761,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: -3.7791748}
+  m_margin: {x: 0, y: 7.0934143, z: 0, w: -3.7791748}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -1810,8 +1810,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 177.15942, y: 426.02173}
-  m_SizeDelta: {x: -805.6388, y: -1007.5536}
+  m_AnchoredPosition: {x: 60.557, y: 421}
+  m_SizeDelta: {x: -2536.3, y: -1024.4501}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1433139993
 MonoBehaviour:
@@ -1826,7 +1826,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 0.1254902, g: 0.1254902, b: 0.1254902, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1873,33 +1873,19 @@ MonoBehaviour:
     wordImage: {fileID: 3998892540963588595, guid: e478eb443191d0b4095d9b0db86a5b83, type: 3}
     letterOptions:
     - A
-    - G
-    - O
+    - I
+    - E
   - wordWithBlank: C _ R
     correctLetter: A
     wordImage: {fileID: 5085253660258721691, guid: 8dc48711cc9cd7c4c9fb76c61afba57b, type: 3}
     letterOptions:
-    - A
-    - I
-    - O
-  - wordWithBlank: B _OK
-    correctLetter: O
-    wordImage: {fileID: 8675622302830905922, guid: e70b239b97766f542b6233db3d713468, type: 3}
-    letterOptions:
-    - A
-    - I
-    - O
-  - wordWithBlank: F _ SH
-    correctLetter: I
-    wordImage: {fileID: -9037153976161384970, guid: 666356b481f33aa46b80790bb0c352f1, type: 3}
-    letterOptions:
-    - A
-    - I
+    - M
     - N
+    - A
   letterButtons:
   - {fileID: 1191835379}
-  - {fileID: 101500667}
   - {fileID: 386241213}
+  - {fileID: 101500667}
 --- !u!1 &1522232877
 GameObject:
   m_ObjectHideFlags: 0
