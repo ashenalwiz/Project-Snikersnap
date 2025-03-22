@@ -515,6 +515,12 @@
             "attempts": 1,
             "correct": false,
             "skipped": true
+        },
+        {
+            "word": "Rock",
+            "attempts": 3,
+            "correct": false,
+            "skipped": true
         }
     ]
 }
