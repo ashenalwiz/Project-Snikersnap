@@ -6,7 +6,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
-    public TextMeshProUGUI countdownText; // We'll keep this reference but not use it
+    public TextMeshProUGUI countdownText; 
     public LetterSpawner letterSpawner;
     public BasketController basketController;
     public ProgressManager progressManager;
@@ -21,6 +21,7 @@ public class GameManager : MonoBehaviour
 
     private bool gameActive = false;
 
+    // Ensures only one instance of GameManager exists (Singleton pattern)
     private void Awake()
     {
         if (Instance == null)
@@ -29,6 +30,7 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
     }
 
+    // Initializes game components and starts the game immediately
     void Start()
     {
         // Find references if not assigned
@@ -49,6 +51,7 @@ public class GameManager : MonoBehaviour
         StartGame();
     }
 
+    // Starts the game and enables necessary game components
     public void StartGame()
     {
         // Play start sound
@@ -71,6 +74,7 @@ public class GameManager : MonoBehaviour
         gameActive = true;
     }
 
+    // Restarts the current round without resetting the game
     public void RestartRound()
     {
         // Reset the current round
@@ -81,6 +85,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // Fully restarts the game by resetting progress and restarting gameplay
     public void RestartGame()
     {
         // Full game restart
@@ -98,7 +103,7 @@ public class GameManager : MonoBehaviour
         StartGame();
     }
 
-    // Method to handle skipping a round
+    // Skips the current round and updates progress
     public void SkipRound()
     {
         if (progressManager != null && gameActive)

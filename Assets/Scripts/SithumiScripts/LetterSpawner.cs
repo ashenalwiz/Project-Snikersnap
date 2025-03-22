@@ -4,23 +4,26 @@ using System.Collections.Generic;
 
 public class LetterSpawner : MonoBehaviour
 {
-    public TextMeshProUGUI mainLetterText;
-    public GameObject letterPrefab;
-    public RectTransform canvasTransform;
-    public float spawnInterval = 0.5f;
-    public float fallSpeed = 30f;
-    public int lettersPerSpawn = 3;
+    [Header("UI References")]
+    public TextMeshProUGUI mainLetterText; // Displays the main letter to match
+    public GameObject letterPrefab; // Prefab for falling letters
+    public RectTransform canvasTransform; // Reference to the UI canvas
+
+    [Header("Spawn Settings")]
+    public float spawnInterval = 0.5f; // Time between each letter spawn
+    public float fallSpeed = 30f; // Speed at which letters fall (currently unused)
+    public int lettersPerSpawn = 3; // Number of letters spawned at a time
     [Range(0, 1)]
-    public float matchingLetterChance = 0.2f; // 20% chance for matching letters
+    public float matchingLetterChance = 0.2f; // 20% chance for a matching letter
 
-    private char currentLetter;
-    private float minX = -9.68f;
-    private float maxX = 3.51f;
-    private List<RectTransform> activeLetters = new List<RectTransform>();
-    private float destroyY;
-    private bool isSpawning = false;
+    private char currentLetter; // Stores the letter to match
+    private float minX = -9.68f; // Minimum X position for spawning letters
+    private float maxX = 3.51f; // Maximum X position for spawning letters
+    private List<RectTransform> activeLetters = new List<RectTransform>(); // List of active falling letters
+    private float destroyY; // Y position at which letters get destroyed
+    private bool isSpawning = false; // Flag to track if spawning is active
 
-    private Color[] colors = new Color[]
+    private Color[] colors = new Color[] // Array of random colors for letters
     {
         new Color(0.6f, 0.1f, 0.1f),
         new Color(0.5f, 0.2f, 0.7f),
@@ -34,15 +37,14 @@ public class LetterSpawner : MonoBehaviour
 
     void Start()
     {
-        // Initialize values but don't start spawning yet
+        // Initialize destruction Y position based on canvas height
         destroyY = -canvasTransform.rect.height / 2;
-        GenerateNewLetter();
-
-        // We'll start spawning after the countdown finishes
+        GenerateNewLetter(); // Generate the first letter to match
     }
 
     void Update()
     {
+        // Move each active letter downward slowly
         for (int i = activeLetters.Count - 1; i >= 0; i--)
         {
             if (activeLetters[i] == null) continue;
@@ -50,12 +52,13 @@ public class LetterSpawner : MonoBehaviour
             RectTransform letter = activeLetters[i];
             Vector2 position = letter.anchoredPosition;
 
-            // ULTRA slow falling effect (almost floating)
+            // Apply very slow floating effect for falling letters
             position.y = Mathf.Lerp(position.y, position.y - 0.1f, Time.deltaTime * 0.001f);
-            position.y -= 0.001f * Time.deltaTime; // Tiny additional movement
+            position.y -= 0.001f * Time.deltaTime;
 
             letter.anchoredPosition = position;
 
+            // Destroy letters that fall below the threshold
             if (position.y <= destroyY)
             {
                 Destroy(letter.gameObject);
@@ -64,18 +67,18 @@ public class LetterSpawner : MonoBehaviour
         }
     }
 
-    // Call this method after countdown finishes
+    // Starts letter spawning (call this after countdown finishes)
     public void StartLetterSpawning()
     {
         if (!isSpawning)
         {
             isSpawning = true;
-            GenerateNewLetter();
+            GenerateNewLetter(); // Generate a new letter before spawning starts
             InvokeRepeating(nameof(SpawnFallingLetter), 1f, spawnInterval);
         }
     }
 
-    // Call this to stop spawning (e.g. when game pauses)
+    // Stops letter spawning (e.g., when the game is paused)
     public void StopLetterSpawning()
     {
         if (isSpawning)
@@ -85,15 +88,19 @@ public class LetterSpawner : MonoBehaviour
         }
     }
 
+    // Generates a new letter to match and updates UI
     public void GenerateNewLetter()
     {
+        // Randomly choose an uppercase or lowercase letter
         currentLetter = Random.value > 0.5f
             ? (char)Random.Range(65, 91) // Uppercase A-Z
             : (char)Random.Range(97, 123); // Lowercase a-z
-        mainLetterText.text = currentLetter.ToString();
-        mainLetterText.color = colors[Random.Range(0, colors.Length)];
+
+        mainLetterText.text = currentLetter.ToString(); // Update UI
+        mainLetterText.color = colors[Random.Range(0, colors.Length)]; // Assign random color
     }
 
+    // Clears all falling letters from the screen
     public void ClearFallingLetters()
     {
         for (int i = activeLetters.Count - 1; i >= 0; i--)
@@ -106,6 +113,7 @@ public class LetterSpawner : MonoBehaviour
         activeLetters.Clear();
     }
 
+    // Spawns falling letters with random characters
     void SpawnFallingLetter()
     {
         if (letterPrefab == null || canvasTransform == null)
@@ -117,9 +125,7 @@ public class LetterSpawner : MonoBehaviour
         for (int i = 0; i < lettersPerSpawn; i++)
         {
             char fallingLetter;
-
-            // Determine if this letter should match the main letter (with opposite case)
-            bool shouldMatch = Random.value <= matchingLetterChance;
+            bool shouldMatch = Random.value <= matchingLetterChance; // Check if letter should match
 
             if (shouldMatch)
             {
@@ -130,19 +136,19 @@ public class LetterSpawner : MonoBehaviour
             }
             else
             {
-                // Generate a random letter of the opposite case
-                // Make sure it's not the same letter as the main letter (even in different case)
+                // Generate a random letter of the opposite case, ensuring it’s not the main letter
                 char randomLetter;
                 do
                 {
                     randomLetter = char.IsUpper(currentLetter)
-                        ? (char)Random.Range(97, 123)  // lowercase a-z
-                        : (char)Random.Range(65, 91);  // uppercase A-Z
+                        ? (char)Random.Range(97, 123)  // Lowercase a-z
+                        : (char)Random.Range(65, 91);  // Uppercase A-Z
                 } while (char.ToUpper(randomLetter) == char.ToUpper(currentLetter));
 
                 fallingLetter = randomLetter;
             }
 
+            // Instantiate letter prefab and position it
             GameObject newLetter = Instantiate(letterPrefab, canvasTransform);
             newLetter.name = "FallingLetter_" + fallingLetter;
 
@@ -158,6 +164,7 @@ public class LetterSpawner : MonoBehaviour
                 continue;
             }
 
+            // Set letter text and color
             TextMeshProUGUI letterText = newLetter.GetComponentInChildren<TextMeshProUGUI>();
             if (letterText != null)
             {
