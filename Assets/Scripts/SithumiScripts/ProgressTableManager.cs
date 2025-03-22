@@ -39,8 +39,32 @@ public class ProgressTableManager : MonoBehaviour
             try
             {
                 string jsonData = File.ReadAllText(saveFilePath);
+                Debug.Log("Raw JSON: " + jsonData);
+
+                // First try to parse directly to our class
                 progressData = JsonUtility.FromJson<SithumiProgress.ProgressData>(jsonData);
                 Debug.Log($"Data loaded successfully with {progressData.sessions.Count} sessions");
+
+                // Check if data might be using original GameStatsRecorder format
+                if (progressData.sessions.Count > 0)
+                {
+                    // Quick validation to see if we might have a data issue
+                    bool needsValidation = true;
+                    foreach (var session in progressData.sessions)
+                    {
+                        if (!string.IsNullOrEmpty(session.Date))
+                        {
+                            needsValidation = false;
+                            break;
+                        }
+                    }
+
+                    if (needsValidation)
+                    {
+                        Debug.LogWarning("Date field appears empty, attempting to handle possible format issues...");
+                        ValidateAndRepairSessionData();
+                    }
+                }
             }
             catch (Exception e)
             {
@@ -55,6 +79,24 @@ public class ProgressTableManager : MonoBehaviour
         }
     }
 
+    // Add this method to ensure we handle any possible format mismatches
+    private void ValidateAndRepairSessionData()
+    {
+        // If we have sessions but they appear invalid, try to repair them
+        for (int i = 0; i < progressData.sessions.Count; i++)
+        {
+            var session = progressData.sessions[i];
+
+            // Fix if Date is null but has rounds data
+            if (string.IsNullOrEmpty(session.Date) && session.rounds.Count > 0)
+            {
+                // Try to infer date from context or set a placeholder
+                session.Date = "Session " + (i + 1);
+                Debug.LogWarning($"Repaired missing date for session {i + 1}");
+            }
+        }
+    }
+
     public void DisplayProgressData()
     {
         // Clear existing content
@@ -65,7 +107,6 @@ public class ProgressTableManager : MonoBehaviour
 
         // Create ONLY ONE column header
         GameObject header = Instantiate(headerPrefab, contentParent);
-        // Don't call SetHeaderText here - the header prefab should already have text set correctly
 
         if (progressData.sessions == null || progressData.sessions.Count == 0)
         {
@@ -95,7 +136,8 @@ public class ProgressTableManager : MonoBehaviour
             if (sessionTexts.Length > 0)
             {
                 // Use the first text component for the session date
-                sessionTexts[0].text = "Session: " + session.date;
+                // Now correctly using the "Date" property which matches GameStatsRecorder
+                sessionTexts[0].text = "Session: " + session.Date;
                 sessionTexts[0].fontStyle = FontStyles.Bold;
                 sessionTexts[0].fontSize += 2;
                 sessionTexts[0].color = Color.blue;
@@ -140,9 +182,7 @@ public class ProgressTableManager : MonoBehaviour
                         texts[2].color = new Color(0.8f, 0, 0);  // Red
                     else
                         texts[2].color = Color.red;  // For 0.0%
-
                 }
-
             }
         }
     }
@@ -150,13 +190,14 @@ public class ProgressTableManager : MonoBehaviour
     // Helper function to create sample data (for testing)
     public void CreateSampleData()
     {
+        // Updated to match GameStatsRecorder's format with "Date" instead of "date"
         SithumiProgress.ProgressData sample = new SithumiProgress.ProgressData
         {
             sessions = new List<SithumiProgress.Session>
             {
                 new SithumiProgress.Session
                 {
-                    date = DateTime.Now.ToString("dd-MM-yyyy"),
+                    Date = DateTime.Now.ToString("dd-MM-yyyy"),
                     rounds = new List<SithumiProgress.Round>
                     {
                         new SithumiProgress.Round { round = 1, targetLetter = "A-a", accuracy = 85.5f, attempts = 10, skipped = false },
@@ -189,5 +230,4 @@ public class ProgressTableManager : MonoBehaviour
         progressData = new SithumiProgress.ProgressData { sessions = new List<SithumiProgress.Session>() };
         DisplayProgressData();
     }
-
 }

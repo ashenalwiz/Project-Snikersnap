@@ -16,13 +16,15 @@ namespace SithumiProgress
     [System.Serializable]
     public class Session
     {
-        public string date;
-        public List<Round> rounds;
+        // Changed from "date" to "Date" to match GameStatsRecorder's SessionData1
+        public string Date;
+        public List<Round> rounds = new List<Round>();
     }
 
     [System.Serializable]
     public class ProgressData
     {
-        public List<Session> sessions;
+        // Changed to match the SithumiProgressData structure from GameStatsRecorder
+        public List<Session> sessions = new List<Session>();
     }
 }
