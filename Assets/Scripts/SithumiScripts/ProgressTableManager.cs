@@ -8,7 +8,7 @@ using TMPro;
 public class ProgressTableManager : MonoBehaviour
 {
     // Define the filename for storing progress data
-    private const string PROGRESS_FILENAME = "SithumiProgress.json";
+    private const string PROGRESS_FILENAME = "Task3UserProgress.json";
     private string saveFilePath;
 
     // UI References: Assign in Unity Inspector

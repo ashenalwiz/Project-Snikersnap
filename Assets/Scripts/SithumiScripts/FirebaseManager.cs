@@ -633,7 +633,7 @@ public class FirebaseManager : MonoBehaviour
             else
             {
                 // Setup user profile with username
-                UserProfile profile = new UserProfile
+                Firebase.Auth.UserProfile profile = new Firebase.Auth.UserProfile
                 {
                     DisplayName = _username,
                     //TODO: give profile default photo
@@ -715,4 +715,4 @@ public class FirebaseManager : MonoBehaviour
             }
         }
     }
-}s
+}
