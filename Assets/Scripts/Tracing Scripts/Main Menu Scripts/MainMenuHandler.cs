@@ -26,14 +26,12 @@ namespace TracingScripts
         // Start is called before the first frame update
         void Start()
         {
-            
-            if (PanelSceneHandler.panelToOpen == "choose")
-            {
-                panelName = "choose";
-                PanelSceneHandler.panelToOpen = "";
-                ShowTracingItems(PanelSceneHandler.categorySelected);
-            }
+            panelName = "category"; // Ensure category panel is the default
+            PanelSceneHandler.panelToOpen = "category"; 
+            ShowTracingItems(PanelSceneHandler.categorySelected);
         }
+
+
 
         public void ShowTracingItems(string category)
         {
