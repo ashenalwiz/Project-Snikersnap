@@ -3,9 +3,7 @@ using System.Collections;
 using Firebase;
 using Firebase.Auth;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine.UI;
-using static UnityEngine.Rendering.VirtualTexturing.Debugging;
 
 public class FirebaseManager : MonoBehaviour
 {
@@ -29,22 +27,11 @@ public class FirebaseManager : MonoBehaviour
 
     [Header("Password Reset")]
     [SerializeField]
-    private GameObject passwordResetUI; 
+    private GameObject passwordResetUI;
     [SerializeField]
     private TMP_InputField resetEmailField;
     [SerializeField]
     private TMP_Text resetEmailOutput;
-    [Space(5f)]
-
-    [Header("User Profile")]
-    [SerializeField]
-    private TMP_InputField updateUsernameField;
-    [SerializeField]
-    private TMP_InputField updatePasswordField;
-    [SerializeField]
-    private TMP_InputField confirmUpdatePasswordField;
-    [SerializeField]
-    private TMP_Text profileUpdateOutput;
     [Space(5f)]
 
     [Header("Loading")]
@@ -85,11 +72,12 @@ public class FirebaseManager : MonoBehaviour
         StartCoroutine(CheckAndFixDependancies());
     }
 
-    // Add these new methods for password reset
+    // Password reset methods
     public void OpenPasswordResetUI()
     {
         AuthUIManager.instance.PasswordResetScreen();
     }
+
     public void PasswordResetButton()
     {
         StartCoroutine(SendPasswordResetEmail(resetEmailField.text));
@@ -147,7 +135,7 @@ public class FirebaseManager : MonoBehaviour
         AuthUIManager.instance.LoginScreen();
     }
 
-    // 3. Add logout functionality
+    // Logout functionality
     public void LogoutUser()
     {
         StartCoroutine(LogoutLogic());
@@ -170,90 +158,7 @@ public class FirebaseManager : MonoBehaviour
         AuthUIManager.instance.LoginScreen();
     }
 
-    // 4. Add profile management
-    public void UpdateProfileButton()
-    {
-        StartCoroutine(UpdateProfileLogic());
-    }
-
-    private IEnumerator UpdateProfileLogic()
-    {
-        ShowLoading(true);
-
-        // If user is trying to update username
-        if (!string.IsNullOrEmpty(updateUsernameField.text))
-        {
-            UserProfile profile = new UserProfile
-            {
-                DisplayName = updateUsernameField.text
-            };
-
-            var updateTask = user.UpdateUserProfileAsync(profile);
-            yield return new WaitUntil(() => updateTask.IsCompleted);
-
-            if (updateTask.Exception != null)
-            {
-                profileUpdateOutput.text = "Failed to update username.";
-                ShowLoading(false);
-                yield break;
-            }
-            else
-            {
-                profileUpdateOutput.text = "Username updated successfully!";
-            }
-        }
-
-        // If user is trying to update password
-        if (!string.IsNullOrEmpty(updatePasswordField.text))
-        {
-            // Validate password
-            if (updatePasswordField.text.Length < 6)
-            {
-                profileUpdateOutput.text = "Password must be at least 6 characters.";
-                ShowLoading(false);
-                yield break;
-            }
-
-            // Check if passwords match
-            if (updatePasswordField.text != confirmUpdatePasswordField.text)
-            {
-                profileUpdateOutput.text = "Passwords do not match.";
-                ShowLoading(false);
-                yield break;
-            }
-
-            var passwordTask = user.UpdatePasswordAsync(updatePasswordField.text);
-            yield return new WaitUntil(() => passwordTask.IsCompleted);
-
-            if (passwordTask.Exception != null)
-            {
-                FirebaseException firebaseException = (FirebaseException)passwordTask.Exception.GetBaseException();
-                AuthError error = (AuthError)firebaseException.ErrorCode;
-
-                switch (error)
-                {
-                    case AuthError.WeakPassword:
-                        profileUpdateOutput.text = "Password is too weak.";
-                        break;
-                    case AuthError.RequiresRecentLogin:
-                        profileUpdateOutput.text = "Please re-authenticate to change password.";
-                        StartCoroutine(ReauthenticateUser());
-                        break;
-                    default:
-                        profileUpdateOutput.text = "Failed to update password.";
-                        break;
-                }
-            }
-            else
-            {
-                profileUpdateOutput.text = "Password updated successfully!";
-            }
-        }
-
-        ShowLoading(false);
-    }
-
-    // 5. Handle Remember Me functionality
+    // Remember Me functionality
     private void UpdateRememberMePreference(bool remember)
     {
         PlayerPrefs.SetInt(RememberMeKey, remember ? 1 : 0);
@@ -265,59 +170,7 @@ public class FirebaseManager : MonoBehaviour
         UpdateRememberMePreference(rememberMeToggle.isOn);
     }
 
-    // 6. Add reauthentication for sensitive operations
-    private IEnumerator ReauthenticateUser()
-    {
-        // This would typically open a new dialog asking for credentials
-        // For now, we'll just redirect to login
-        LogoutUser();
-        yield return new WaitForSeconds(0.5f);
-        loginOutputText.text = "Please login again to continue";
-    }
-
-    // 7. Account deletion functionality
-    public void DeleteAccountButton()
-    {
-        StartCoroutine(DeleteAccountLogic());
-    }
-
-    private IEnumerator DeleteAccountLogic()
-    {
-        ShowLoading(true);
-
-        if (user != null)
-        {
-            var deleteTask = user.DeleteAsync();
-            yield return new WaitUntil(() => deleteTask.IsCompleted);
-
-            if (deleteTask.Exception != null)
-            {
-                FirebaseException firebaseException = (FirebaseException)deleteTask.Exception.GetBaseException();
-                AuthError error = (AuthError)firebaseException.ErrorCode;
-
-                string output = "Failed to delete account.";
-
-                switch (error)
-                {
-                    case AuthError.RequiresRecentLogin:
-                        output = "Please re-authenticate to delete your account.";
-                        StartCoroutine(ReauthenticateUser());
-                        break;
-                }
-
-                loginOutputText.text = output;
-            }
-            else
-            {
-                loginOutputText.text = "Account deleted successfully.";
-                AuthUIManager.instance.LoginScreen();
-            }
-        }
-
-        ShowLoading(false);
-    }
-
-    // 8. Enhanced validation methods
+    // Validation methods
     private bool IsValidEmail(string email)
     {
         // Basic email validation
@@ -338,7 +191,7 @@ public class FirebaseManager : MonoBehaviour
         return true;
     }
 
-    // 9. Utility methods
+    // Utility methods
     private void ShowLoading(bool isLoading)
     {
         if (loadingPanel != null)
@@ -369,7 +222,6 @@ public class FirebaseManager : MonoBehaviour
 
         auth.StateChanged += AuthStateChanged;
         AuthStateChanged(this, null);
-
     }
 
     private IEnumerator CheckAutoLogin()
@@ -385,7 +237,6 @@ public class FirebaseManager : MonoBehaviour
         {
             AuthUIManager.instance.LoginScreen();
         }
-
     }
 
     private void AutoLogin()
@@ -394,8 +245,6 @@ public class FirebaseManager : MonoBehaviour
         {
             if (user.IsEmailVerified)
             {
-                // Initialize user data here, after user is verified
-                UserProfileManager.instance.InitializeUserData(user);
                 FirebaseGameManager.instance.ChangeScene(1);
             }
             else
@@ -403,12 +252,10 @@ public class FirebaseManager : MonoBehaviour
                 StartCoroutine(sendVerificationEmail());
             }
         }
-
         else
         {
             AuthUIManager.instance.LoginScreen();
         }
-
     }
 
     private void AuthStateChanged(object sender, System.EventArgs eventArgs)
@@ -420,7 +267,7 @@ public class FirebaseManager : MonoBehaviour
             if (signedIn && user != null)
             {
                 Debug.Log("Signed Out");
-            } 
+            }
 
             user = auth.CurrentUser;
 
@@ -430,7 +277,7 @@ public class FirebaseManager : MonoBehaviour
             }
         }
     }
-    
+
     public void ClearOutputs()
     {
         loginOutputText.text = "";
@@ -447,7 +294,7 @@ public class FirebaseManager : MonoBehaviour
         StartCoroutine(registerLogic(registerUsername.text, RegisterEmail.text, RegisterPassword.text, RegisterConfirmPassword.text));
     }
 
-    // Update login method to handle Remember Me
+    // Login method with Remember Me
     private IEnumerator loginLogic(string email, string password)
     {
         // Show loading indicator
@@ -508,8 +355,6 @@ public class FirebaseManager : MonoBehaviour
 
             if (user.IsEmailVerified)
             {
-                // Initialize user data
-                UserProfileManager.instance.InitializeUserData(user);
                 yield return new WaitForSeconds(1f);
                 FirebaseGameManager.instance.ChangeScene(1);
             }
@@ -520,7 +365,7 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
-    private IEnumerator registerLogic(string _username, string _email,  string _password, string _confirmPassword)
+    private IEnumerator registerLogic(string _username, string _email, string _password, string _confirmPassword)
     {
         ShowLoading(true);
 
@@ -589,7 +434,7 @@ public class FirebaseManager : MonoBehaviour
                 };
 
                 var DefaultUserTask = user.UpdateUserProfileAsync(profile);
-                yield return new WaitUntil(predicate : () => DefaultUserTask.IsCompleted);
+                yield return new WaitUntil(predicate: () => DefaultUserTask.IsCompleted);
 
                 if (DefaultUserTask.Exception != null)
                 {
@@ -608,17 +453,20 @@ public class FirebaseManager : MonoBehaviour
                             break;
                     }
                     registerOutputText.text = output;
-
                 }
                 else
                 {
                     Debug.Log($"Firebase User Created Successfully: {user.DisplayName} ({user.UserId})");
-
                     StartCoroutine(sendVerificationEmail());
                 }
                 ShowLoading(false);
             }
         }
+    }
+
+    public void ResendVerificationEmail()
+    {
+        StartCoroutine(sendVerificationEmail());
     }
 
     private IEnumerator sendVerificationEmail()
@@ -649,9 +497,7 @@ public class FirebaseManager : MonoBehaviour
                 }
 
                 AuthUIManager.instance.AwaitVerification(false, user.Email, output);
-
             }
-
             else
             {
                 AuthUIManager.instance.AwaitVerification(true, user.Email, null);
@@ -660,5 +506,3 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 }
-
-
