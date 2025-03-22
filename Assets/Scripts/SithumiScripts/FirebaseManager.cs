@@ -4,71 +4,81 @@ using Firebase;
 using Firebase.Auth;
 using TMPro;
 using UnityEngine.UI;
+using System.Net;
+using UnityEngine.SocialPlatforms.Impl;
 
+// Manages all Firebase authentication operations including login, registration,
+// email verification, password reset, and persistent login.
 public class FirebaseManager : MonoBehaviour
 {
+    // Singleton instance for global access
     public static FirebaseManager instance;
 
     [Header("Firebase")]
-    public FirebaseAuth auth;
-    public FirebaseUser user;
+    public FirebaseAuth auth;       // Firebase Authentication instance
+    public FirebaseUser user;       // Current Firebase user
     [Space(5f)]
 
     [Header("Login References")]
     [SerializeField]
-    private TMP_InputField loginEmail;
+    private TMP_InputField loginEmail;      // Input field for login email
     [SerializeField]
-    private TMP_InputField loginPassword;
+    private TMP_InputField loginPassword;   // Input field for login password
     [SerializeField]
-    private TMP_Text loginOutputText;
+    private TMP_Text loginOutputText;       // Text to display login results/errors
     [SerializeField]
-    private Toggle rememberMeToggle;
+    private Toggle rememberMeToggle;        // Toggle for "Remember Me" functionality
     [Space(5f)]
 
     [Header("Password Reset")]
     [SerializeField]
-    private GameObject passwordResetUI;
+    private GameObject passwordResetUI;     // UI panel for password reset
     [SerializeField]
-    private TMP_InputField resetEmailField;
+    private TMP_InputField resetEmailField; // Input field for reset email
     [SerializeField]
-    private TMP_Text resetEmailOutput;
+    private TMP_Text resetEmailOutput;      // Text to display reset results/errors
     [Space(5f)]
 
     [Header("Email Verification")]
     [SerializeField]
-    private float verificationCheckDelay = 5f; // Check every 5 seconds
-    private Coroutine verificationCheckCoroutine;
+    private float verificationCheckDelay = 5f; // Interval to check verification status
+    private Coroutine verificationCheckCoroutine; // Reference to verification check coroutine
     [Space(5f)]
 
     [Header("Loading")]
     [SerializeField]
-    private GameObject loadingPanel;
+    private GameObject loadingPanel;        // Loading indicator panel
 
-    // for persistent login
+    // PlayerPrefs keys for persistent login
     private const string RememberMeKey = "FirebaseRememberMe";
     private const string SavedEmailKey = "FirebaseSavedEmail";
     private const string SavedPasswordKey = "FirebaseSavedPassword";
 
     [Header("Register References")]
     [SerializeField]
-    private TMP_InputField registerUsername;
+    private TMP_InputField registerUsername;        // Input field for registration username
     [SerializeField]
-    private TMP_InputField RegisterEmail;
+    private TMP_InputField RegisterEmail;           // Input field for registration email
     [SerializeField]
-    private TMP_InputField RegisterPassword;
+    private TMP_InputField RegisterPassword;        // Input field for registration password
     [SerializeField]
-    private TMP_InputField RegisterConfirmPassword;
+    private TMP_InputField RegisterConfirmPassword; // Input field to confirm password
     [SerializeField]
-    private TMP_Text registerOutputText;
+    private TMP_Text registerOutputText;            // Text to display registration results/errors
 
-    // Store registration info for potential "Remember Me" after verification
+    // Cache registration info for potential "Remember Me" after verification
     private string lastRegisteredEmail;
     private string lastRegisteredPassword;
     private bool shouldRememberAfterRegistration = false;
 
+    // Awake is called when the script instance is being loaded.
+    // Sets up the singleton pattern.
     public void Awake()
     {
+        // Make this object persistent across scenes
         DontDestroyOnLoad(gameObject);
+
+        // Implement singleton pattern
         if (instance == null)
         {
             instance = this;
@@ -80,22 +90,27 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
+    // Start is called before the first frame update.
+    // Initializes Firebase and checks dependencies.
     private void Start()
     {
         StartCoroutine(CheckAndFixDependancies());
     }
 
-    // Password reset methods
+    // Opens the password reset UI screen.
     public void OpenPasswordResetUI()
     {
         AuthUIManager.instance.PasswordResetScreen();
     }
 
+    // Initiates the password reset process when button is clicked.
     public void PasswordResetButton()
     {
         StartCoroutine(SendPasswordResetEmail(resetEmailField.text));
     }
 
+    // Sends a password reset email to the specified address.
+    // email: Email address to send the reset link to
     private IEnumerator SendPasswordResetEmail(string email)
     {
         // Show loading indicator
@@ -109,17 +124,20 @@ public class FirebaseManager : MonoBehaviour
             yield break;
         }
 
+        // Send password reset email
         var resetTask = auth.SendPasswordResetEmailAsync(email);
         yield return new WaitUntil(() => resetTask.IsCompleted);
 
         ShowLoading(false);
 
+        // Handle any errors that occurred
         if (resetTask.Exception != null)
         {
             FirebaseException firebaseException = (FirebaseException)resetTask.Exception.GetBaseException();
             AuthError error = (AuthError)firebaseException.ErrorCode;
             string output = "Unknown Error, Please try again";
 
+            // Convert Firebase error codes to user-friendly messages
             switch (error)
             {
                 case AuthError.InvalidEmail:
@@ -137,30 +155,35 @@ public class FirebaseManager : MonoBehaviour
         }
         else
         {
+            // Success message and return to login screen after delay
             resetEmailOutput.text = "Password reset email sent!";
             StartCoroutine(ReturnToLoginAfterDelay(3f));
         }
     }
 
+    // Returns to login screen after specified delay.
+    // delay: Time in seconds to wait before switching screens
     private IEnumerator ReturnToLoginAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
         AuthUIManager.instance.LoginScreen();
     }
 
-    // Logout functionality
+    // Logs out the current user.
     public void LogoutUser()
     {
         StartCoroutine(LogoutLogic());
     }
 
+    // Handles the logout process.
     private IEnumerator LogoutLogic()
     {
         ShowLoading(true);
 
-        // Clear remember me preference
+        // Clear saved credentials when logging out
         ClearSavedCredentials();
 
+        // Sign out from Firebase
         auth.SignOut();
 
         // Wait for auth state to update
@@ -170,7 +193,9 @@ public class FirebaseManager : MonoBehaviour
         AuthUIManager.instance.LoginScreen();
     }
 
-    // Remember Me functionality
+    // Saves user credentials for "Remember Me" functionality.
+    // email: User's email
+    // password: User's password
     private void SaveCredentials(string email, string password)
     {
         PlayerPrefs.SetInt(RememberMeKey, 1);
@@ -180,6 +205,7 @@ public class FirebaseManager : MonoBehaviour
         PlayerPrefs.Save();
     }
 
+    // Clears saved credentials from PlayerPrefs.
     private void ClearSavedCredentials()
     {
         PlayerPrefs.SetInt(RememberMeKey, 0);
@@ -188,13 +214,14 @@ public class FirebaseManager : MonoBehaviour
         PlayerPrefs.Save();
     }
 
-    // Public method to check the current Remember Me toggle state
+    // Checks if "Remember Me" is currently enabled.
+    // Returns: True if Remember Me is enabled, otherwise false
     public bool IsRememberMeEnabled()
     {
         return rememberMeToggle != null && rememberMeToggle.isOn;
     }
 
-    // Public method to resend verification email
+    // Resends the verification email to the current user.
     public void ResendVerificationEmail()
     {
         if (user != null)
@@ -203,7 +230,7 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
-    // Method to start checking for verification
+    // Starts the verification check process.
     public void StartVerificationCheck()
     {
         // Stop any existing verification check
@@ -213,7 +240,7 @@ public class FirebaseManager : MonoBehaviour
         verificationCheckCoroutine = StartCoroutine(CheckEmailVerificationStatus());
     }
 
-    // Method to stop checking for verification
+    // Stops the verification check process.
     public void StopVerificationCheck()
     {
         if (verificationCheckCoroutine != null)
@@ -223,14 +250,14 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
-    // Coroutine to periodically check verification status
+    // Periodically checks if the user's email has been verified.
     private IEnumerator CheckEmailVerificationStatus()
     {
         while (true)
         {
             if (user != null)
             {
-                // Reload the user to get updated info
+                // Reload the user to get updated verification info
                 var reloadTask = user.ReloadAsync();
                 yield return new WaitUntil(() => reloadTask.IsCompleted);
 
@@ -252,6 +279,7 @@ public class FirebaseManager : MonoBehaviour
                         ClearSavedCredentials();
                     }
 
+                    // Load the game scene
                     FirebaseGameManager.instance.ChangeScene(1);
                     yield break;
                 }
@@ -267,7 +295,9 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
-    // Validation methods
+    // Validates an email address format.
+    // email: Email to validate
+    // Returns: True if email is valid, otherwise false
     private bool IsValidEmail(string email)
     {
         // Basic email validation
@@ -278,6 +308,9 @@ public class FirebaseManager : MonoBehaviour
         return email.Contains("@") && email.Contains(".");
     }
 
+    // Checks if a password meets strength requirements.
+    // password: Password to check
+    // Returns: True if password is strong enough, otherwise false
     private bool IsPasswordStrong(string password)
     {
         if (string.IsNullOrEmpty(password) || password.Length < 6)
@@ -288,13 +321,15 @@ public class FirebaseManager : MonoBehaviour
         return true;
     }
 
-    // Utility methods
+    // Shows or hides the loading panel.
+    // isLoading: True to show loading panel, false to hide
     private void ShowLoading(bool isLoading)
     {
         if (loadingPanel != null)
             loadingPanel.SetActive(isLoading);
     }
 
+    // Checks and fixes Firebase dependencies.
     private IEnumerator CheckAndFixDependancies()
     {
         var checkAndFixDependenciesTask = FirebaseApp.CheckAndFixDependenciesAsync();
@@ -312,15 +347,18 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
+    // Initializes Firebase Authentication and sets up event handlers.
     private void InitializeFirebase()
     {
         auth = FirebaseAuth.DefaultInstance;
         StartCoroutine(CheckAutoLogin());
 
+        // Set up auth state changed event
         auth.StateChanged += AuthStateChanged;
         AuthStateChanged(this, null);
     }
 
+    // Checks if auto-login is possible and attempts it if enabled.
     private IEnumerator CheckAutoLogin()
     {
         yield return new WaitForEndOfFrame();
@@ -359,6 +397,7 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
+    // Handles auto-login based on user verification status.
     private void AutoLogin()
     {
         if (user != null)
@@ -388,6 +427,9 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
+    // Handles Firebase authentication state changes.
+    // sender: Event sender
+    // eventArgs: Event arguments
     private void AuthStateChanged(object sender, System.EventArgs eventArgs)
     {
         if (auth.CurrentUser != user)
@@ -408,17 +450,20 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
+    // Clears all output text fields.
     public void ClearOutputs()
     {
         loginOutputText.text = "";
         registerOutputText.text = "";
     }
 
+    // Initiates login process when login button is clicked.
     public void LoginButton()
     {
         StartCoroutine(loginLogic(loginEmail.text, loginPassword.text, rememberMeToggle.isOn));
     }
 
+    // Initiates registration process when register button is clicked.
     public void RegisterButton()
     {
         // Before registration, check the Remember Me toggle state
@@ -426,7 +471,10 @@ public class FirebaseManager : MonoBehaviour
         StartCoroutine(registerLogic(registerUsername.text, RegisterEmail.text, RegisterPassword.text, RegisterConfirmPassword.text));
     }
 
-    // Updated login method with explicit Remember Me parameter
+    // Handles the login process.
+    // email: User email
+    // password: User password
+    // rememberMe: Whether to remember login credentials
     private IEnumerator loginLogic(string email, string password, bool rememberMe)
     {
         // Show loading indicator
@@ -440,20 +488,24 @@ public class FirebaseManager : MonoBehaviour
             yield break;
         }
 
+        // Create credential from email and password
         Credential credential = EmailAuthProvider.GetCredential(email, password);
 
+        // Attempt to sign in
         var loginTask = auth.SignInWithCredentialAsync(credential);
 
         yield return new WaitUntil(predicate: () => loginTask.IsCompleted);
 
         ShowLoading(false);
 
+        // Handle login errors
         if (loginTask.Exception != null)
         {
             FirebaseException firebaseException = (FirebaseException)loginTask.Exception.GetBaseException();
             AuthError error = (AuthError)firebaseException.ErrorCode;
             string output = "Unknown Error, Please try again";
 
+            // Convert Firebase error codes to user-friendly messages
             switch (error)
             {
                 case AuthError.MissingEmail:
@@ -492,6 +544,7 @@ public class FirebaseManager : MonoBehaviour
                 ClearSavedCredentials();
             }
 
+            // Check if email is verified
             if (user.IsEmailVerified)
             {
                 yield return new WaitForSeconds(1f);
@@ -504,10 +557,16 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
+    // Handles the registration process.
+    // _username: User's chosen username
+    // _email: User's email
+    // _password: User's password
+    // _confirmPassword: Confirmation of password
     private IEnumerator registerLogic(string _username, string _email, string _password, string _confirmPassword)
     {
         ShowLoading(true);
 
+        // Validate registration inputs
         if (string.IsNullOrEmpty(_username) || _username.Length < 3)
         {
             registerOutputText.text = "Username must be at least 3 characters";
@@ -538,15 +597,18 @@ public class FirebaseManager : MonoBehaviour
             lastRegisteredEmail = _email;
             lastRegisteredPassword = _password;
 
+            // Create new user in Firebase
             var registerTask = auth.CreateUserWithEmailAndPasswordAsync(_email, _password);
             yield return new WaitUntil(predicate: () => registerTask.IsCompleted);
 
+            // Handle registration errors
             if (registerTask.Exception != null)
             {
                 FirebaseException firebaseException = (FirebaseException)registerTask.Exception.GetBaseException();
                 AuthError error = (AuthError)firebaseException.ErrorCode;
                 string output = "Unknown Error, Please try again";
 
+                // Convert Firebase error codes to user-friendly messages
                 switch (error)
                 {
                     case AuthError.InvalidEmail:
@@ -570,15 +632,18 @@ public class FirebaseManager : MonoBehaviour
             }
             else
             {
+                // Setup user profile with username
                 UserProfile profile = new UserProfile
                 {
                     DisplayName = _username,
                     //TODO: give profile default photo
                 };
 
+                // Update user profile with username
                 var DefaultUserTask = user.UpdateUserProfileAsync(profile);
                 yield return new WaitUntil(predicate: () => DefaultUserTask.IsCompleted);
 
+                // Handle profile update errors
                 if (DefaultUserTask.Exception != null)
                 {
                     user.DeleteAsync();
@@ -586,6 +651,7 @@ public class FirebaseManager : MonoBehaviour
                     AuthError error = (AuthError)firebaseException.ErrorCode;
                     string output = "Unknown Error, Please try again";
 
+                    // Convert Firebase error codes to user-friendly messages
                     switch (error)
                     {
                         case AuthError.Cancelled:
@@ -607,13 +673,16 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
+    // Sends a verification email to the current user.
     private IEnumerator sendVerificationEmail()
     {
         if (user != null)
         {
+            // Send verification email
             var emailTask = user.SendEmailVerificationAsync();
             yield return new WaitUntil(predicate: () => emailTask.IsCompleted);
 
+            // Handle verification email errors
             if (emailTask.Exception != null)
             {
                 FirebaseException firebaseException = (FirebaseException)emailTask.Exception.GetBaseException();
@@ -621,6 +690,7 @@ public class FirebaseManager : MonoBehaviour
 
                 string output = "Unknown Error, Try Again!";
 
+                // Convert Firebase error codes to user-friendly messages
                 switch (error)
                 {
                     case AuthError.Cancelled:
@@ -645,4 +715,4 @@ public class FirebaseManager : MonoBehaviour
             }
         }
     }
-}
+}s
