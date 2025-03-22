@@ -14,20 +14,20 @@
         },
         {
             "letter": "D",
-            "attempts": 1,
-            "correctAnswers": 1,
+            "attempts": 2,
+            "correctAnswers": 2,
             "averageResponseTime": 0.0
         },
         {
             "letter": "E",
-            "attempts": 1,
+            "attempts": 2,
             "correctAnswers": 1,
             "averageResponseTime": 0.0
         },
         {
             "letter": "F",
-            "attempts": 2,
-            "correctAnswers": 1,
+            "attempts": 3,
+            "correctAnswers": 2,
             "averageResponseTime": 0.0
         },
         {
@@ -38,14 +38,14 @@
         },
         {
             "letter": "H",
-            "attempts": 3,
-            "correctAnswers": 2,
+            "attempts": 6,
+            "correctAnswers": 4,
             "averageResponseTime": 0.0
         },
         {
             "letter": "I",
-            "attempts": 2,
-            "correctAnswers": 2,
+            "attempts": 3,
+            "correctAnswers": 3,
             "averageResponseTime": 0.0
         },
         {
@@ -56,8 +56,8 @@
         },
         {
             "letter": "K",
-            "attempts": 0,
-            "correctAnswers": 0,
+            "attempts": 2,
+            "correctAnswers": 1,
             "averageResponseTime": 0.0
         },
         {
@@ -68,8 +68,8 @@
         },
         {
             "letter": "M",
-            "attempts": 2,
-            "correctAnswers": 1,
+            "attempts": 3,
+            "correctAnswers": 2,
             "averageResponseTime": 0.0
         },
         {
@@ -92,26 +92,26 @@
         },
         {
             "letter": "R",
-            "attempts": 2,
+            "attempts": 3,
             "correctAnswers": 1,
             "averageResponseTime": 0.0
         },
         {
             "letter": "S",
-            "attempts": 4,
-            "correctAnswers": 2,
+            "attempts": 5,
+            "correctAnswers": 3,
             "averageResponseTime": 0.0
         },
         {
             "letter": "T",
-            "attempts": 2,
-            "correctAnswers": 1,
+            "attempts": 3,
+            "correctAnswers": 2,
             "averageResponseTime": 0.0
         },
         {
             "letter": "U",
-            "attempts": 1,
-            "correctAnswers": 1,
+            "attempts": 3,
+            "correctAnswers": 3,
             "averageResponseTime": 0.0
         },
         {
@@ -134,8 +134,8 @@
         },
         {
             "letter": "Z",
-            "attempts": 0,
-            "correctAnswers": 0,
+            "attempts": 1,
+            "correctAnswers": 1,
             "averageResponseTime": 0.0
         }
     ]
