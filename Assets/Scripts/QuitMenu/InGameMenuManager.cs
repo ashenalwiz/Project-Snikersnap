@@ -71,6 +71,14 @@ public class InGameMenuManager : MonoBehaviour
         SceneManager.LoadScene("TaskHolder"); // Change "TaskHolder" to your actual Main Menu scene name
     }
 
+    //create a quitmethod to go to the mainmenu
+    public void QuitToMenu()
+    {
+        Debug.Log("Yes button pressed, going to TaskHolder...");
+        Time.timeScale = 1f; // Reset game speed
+        SceneManager.LoadScene("MainMenu"); // Change "TaskHolder" to your actual Main Menu scene name
+    }
+
     public void UpdateMusicVolume()
     {
         musicSource.volume = musicVolumeSlider.value;
