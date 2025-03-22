@@ -26,7 +26,7 @@
         },
         {
             "letter": "F",
-            "attempts": 3,
+            "attempts": 4,
             "correctAnswers": 2,
             "averageResponseTime": 0.0
         },
@@ -44,8 +44,8 @@
         },
         {
             "letter": "I",
-            "attempts": 3,
-            "correctAnswers": 3,
+            "attempts": 4,
+            "correctAnswers": 4,
             "averageResponseTime": 0.0
         },
         {
@@ -110,8 +110,8 @@
         },
         {
             "letter": "U",
-            "attempts": 3,
-            "correctAnswers": 3,
+            "attempts": 4,
+            "correctAnswers": 4,
             "averageResponseTime": 0.0
         },
         {
