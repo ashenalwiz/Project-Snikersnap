@@ -4,6 +4,12 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/TracingMainMenu.unity
+    guid: 809f0fe6eb6a75d4dbd519f6967671fa
+  - enabled: 1
+    path: Assets/Scenes/TracingMainGame.unity
+    guid: 3a3d16ab915b93d41b51303cc79736d4
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0
