@@ -103,3 +103,4 @@ Assets/Plugins/tvOS/Firebase/*.a
 *.swp
 
 /Assets/StreamingAssets
+Assets/Plugins/Android/FirebaseApp.androidlib/res/values/google-services.xml
