@@ -129,9 +129,6 @@ public class EndGameMenu : MonoBehaviour
                 if (starSound != null)
                     starSound.Play();
 
-                // Optional: You could add animation here
-                // Example: starObjects[i].GetComponent<Animator>().SetTrigger("Appear");
-
                 yield return new WaitForSeconds(starDelay);
             }
         }
