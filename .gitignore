@@ -102,3 +102,4 @@ Assets/Plugins/tvOS/Firebase/*.a
 *.bak
 *.swp
 
+/Assets/StreamingAssets
