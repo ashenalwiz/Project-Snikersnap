@@ -38,9 +38,12 @@ public class InGameMenuManager : MonoBehaviour
 
     public void ToggleMenu()
     {
+
+
         // If menu is hidden, show it; if it's shown, hide it
         bool isActive = inGameMenuPanel.activeSelf;
-        inGameMenuPanel.SetActive(!isActive);
+        inGameMenuPanel.SetActive(true);
+        Debug.Log("Menu is active: " + !isActive);
 
         // Pause or resume game based on menu state
         Time.timeScale = inGameMenuPanel.activeSelf ? 0f : 1f;
