@@ -1,0 +1,32 @@
+{
+    "sessions": [
+        {
+            "date": "2025-03-22 12:56:15",
+            "duration": 0.4502177666666667,
+            "totalTries": 8,
+            "correctTries": 5,
+            "accuracy": 62.5
+        },
+        {
+            "date": "2025-03-22 13:47:27",
+            "duration": 0.8015760833333333,
+            "totalTries": 7,
+            "correctTries": 5,
+            "accuracy": 71.42857360839844
+        },
+        {
+            "date": "2025-03-22 13:55:01",
+            "duration": 0.3759094500000001,
+            "totalTries": 6,
+            "correctTries": 5,
+            "accuracy": 83.33333587646485
+        },
+        {
+            "date": "2025-03-22 13:58:56",
+            "duration": 0.5271874333333334,
+            "totalTries": 6,
+            "correctTries": 5,
+            "accuracy": 83.33333587646485
+        }
+    ]
+}

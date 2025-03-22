@@ -6,10 +6,25 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/TracingMainMenu.unity
-    guid: 809f0fe6eb6a75d4dbd519f6967671fa
+    path: Assets/Scenes/TaskHolder.unity
+    guid: 9ca279022a834434abf4ced8928b1697
   - enabled: 1
-    path: Assets/Scenes/TracingMainGame.unity
-    guid: 3a3d16ab915b93d41b51303cc79736d4
+    path: Assets/Scenes/Task2.unity
+    guid: 88a57e9474ec6475eb682291a32cf380
+  - enabled: 1
+    path: Assets/Scenes/Task4.unity
+    guid: ded14453dbfa8c744b7bd7cb40ab4063
+  - enabled: 1
+    path: Assets/Scenes/Task8.unity
+    guid: cca792337fcc7494f8135bb512cd49b6
+  - enabled: 1
+    path: Assets/Scenes/Task9.unity
+    guid: 9d51470e7578b0647bfcaa25518b9c34
+  - enabled: 1
+    path: Assets/Scenes/Task7.unity
+    guid: 177f18715581f604b84936fe0f4561ac
+  - enabled: 1
+    path: Assets/Scenes/MainMenu.unity
+    guid: 941c6668e99812c46b9902bfb2ed82cd
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

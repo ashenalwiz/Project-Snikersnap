@@ -1,0 +1,142 @@
+{
+    "letters": [
+        {
+            "letter": "B",
+            "attempts": 0,
+            "correctAnswers": 0,
+            "averageResponseTime": 0.0
+        },
+        {
+            "letter": "C",
+            "attempts": 2,
+            "correctAnswers": 1,
+            "averageResponseTime": 0.0
+        },
+        {
+            "letter": "D",
+            "attempts": 2,
+            "correctAnswers": 2,
+            "averageResponseTime": 0.0
+        },
+        {
+            "letter": "E",
+            "attempts": 4,
+            "correctAnswers": 2,
+            "averageResponseTime": 0.0
+        },
+        {
+            "letter": "F",
+            "attempts": 4,
+            "correctAnswers": 2,
+            "averageResponseTime": 0.0
+        },
+        {
+            "letter": "G",
+            "attempts": 1,
+            "correctAnswers": 1,
+            "averageResponseTime": 0.0
+        },
+        {
+            "letter": "H",
+            "attempts": 6,
+            "correctAnswers": 4,
+            "averageResponseTime": 0.0
+        },
+        {
+            "letter": "I",
+            "attempts": 4,
+            "correctAnswers": 4,
+            "averageResponseTime": 0.0
+        },
+        {
+            "letter": "J",
+            "attempts": 0,
+            "correctAnswers": 0,
+            "averageResponseTime": 0.0
+        },
+        {
+            "letter": "K",
+            "attempts": 3,
+            "correctAnswers": 2,
+            "averageResponseTime": 0.0
+        },
+        {
+            "letter": "L",
+            "attempts": 0,
+            "correctAnswers": 0,
+            "averageResponseTime": 0.0
+        },
+        {
+            "letter": "M",
+            "attempts": 3,
+            "correctAnswers": 2,
+            "averageResponseTime": 0.0
+        },
+        {
+            "letter": "O",
+            "attempts": 1,
+            "correctAnswers": 1,
+            "averageResponseTime": 0.0
+        },
+        {
+            "letter": "P",
+            "attempts": 1,
+            "correctAnswers": 1,
+            "averageResponseTime": 0.0
+        },
+        {
+            "letter": "Q",
+            "attempts": 0,
+            "correctAnswers": 0,
+            "averageResponseTime": 0.0
+        },
+        {
+            "letter": "R",
+            "attempts": 3,
+            "correctAnswers": 1,
+            "averageResponseTime": 0.0
+        },
+        {
+            "letter": "S",
+            "attempts": 5,
+            "correctAnswers": 3,
+            "averageResponseTime": 0.0
+        },
+        {
+            "letter": "T",
+            "attempts": 3,
+            "correctAnswers": 2,
+            "averageResponseTime": 0.0
+        },
+        {
+            "letter": "U",
+            "attempts": 4,
+            "correctAnswers": 4,
+            "averageResponseTime": 0.0
+        },
+        {
+            "letter": "V",
+            "attempts": 1,
+            "correctAnswers": 1,
+            "averageResponseTime": 0.0
+        },
+        {
+            "letter": "W",
+            "attempts": 5,
+            "correctAnswers": 3,
+            "averageResponseTime": 0.0
+        },
+        {
+            "letter": "X",
+            "attempts": 1,
+            "correctAnswers": 1,
+            "averageResponseTime": 0.0
+        },
+        {
+            "letter": "Z",
+            "attempts": 1,
+            "correctAnswers": 1,
+            "averageResponseTime": 0.0
+        }
+    ]
+}

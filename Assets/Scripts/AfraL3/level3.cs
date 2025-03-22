@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections.Generic;
+using System.IO;
 
 public class WordGameManager : MonoBehaviour
 {
@@ -14,114 +16,122 @@ public class WordGameManager : MonoBehaviour
         public string correctAnswer;
     }
 
+    [System.Serializable]
+    public class RoundData
+    {
+        public int roundID;
+        public int questionsAttempted;
+        public int correctAnswers;
+        public int soundsPlayed;
+    }
+
+    [System.Serializable]
+    public class GameData
+    {
+        public List<RoundData> rounds = new List<RoundData>();
+    }
+
     public Question[] questions;
     private int currentQuestionIndex = 0;
-    private int score = 0; // Score variable to keep track of the correct answers
+    private int score = 0;
+    private int soundsPlayed = 0;
+    private GameData gameData = new GameData();
 
     public AudioSource audioSource;
-    public AudioSource messageAudioSource;  // New AudioSource for messages
-    public AudioClip correctSound; // Correct answer sound
-    public AudioClip wrongSound;   // Wrong answer sound
-
+    public AudioSource messageAudioSource;
+    public AudioClip correctSound;
+    public AudioClip wrongSound;
+    
     public Button replayButton;
     public Button option1Button;
     public Button option2Button;
     public TextMeshProUGUI option1Text;
     public TextMeshProUGUI option2Text;
-    public TextMeshProUGUI messageText;  // TextMeshProUGUI for messages
-    public TextMeshProUGUI scoreText;    // TextMeshProUGUI to display the score
-    public GameObject gameOverImage; // Game Over Image
+    public TextMeshProUGUI messageText;
+    public TextMeshProUGUI scoreText;
+    public GameObject gameOverImage;
+
+    private RoundData currentRound;
+    private string savePath;
 
     void Start()
     {
-        if (messageText == null)
-        {
-            Debug.LogError("MessageText UI element is not assigned in the Inspector!");
-            return;
-        }
+        savePath = Path.Combine(Application.dataPath, "GameData/progress.json");
+        LoadProgress();
+        gameOverImage.SetActive(false);
+        scoreText.text = "Score: " + score;
 
-        if (scoreText == null)
-        {
-            Debug.LogError("ScoreText UI element is not assigned in the Inspector!");
-            return;
-        }
-
-        if (gameOverImage == null)
-        {
-            Debug.LogError("GameOverImage UI element is not assigned in the Inspector!");
-            return;
-        }
-
-        gameOverImage.SetActive(false); // Hide Game Over image at the start
-        scoreText.text = "Score: " + score;  // Initialize the score display
-
-        LoadQuestion();
         replayButton.onClick.AddListener(PlayAudio);
         option1Button.onClick.AddListener(() => CheckAnswer(option1Text.text));
         option2Button.onClick.AddListener(() => CheckAnswer(option2Text.text));
+
+        StartNewRound();
+        LoadQuestion();
+    }
+
+    void StartNewRound()
+    {
+        currentRound = new RoundData
+        {
+            roundID = gameData.rounds.Count + 1,
+            questionsAttempted = 0,
+            correctAnswers = 0,
+            soundsPlayed = 0
+        };
     }
 
     void LoadQuestion()
     {
-        if (questions == null || questions.Length == 0)
-        {
-            Debug.LogError("Questions array is empty or not assigned in the Inspector!");
-            return;
-        }
-
         if (currentQuestionIndex >= questions.Length)
         {
-            Debug.Log("Game Over! No more questions.");
             GameOver();
             return;
         }
 
         Question currentQuestion = questions[currentQuestionIndex];
-
         option1Text.text = currentQuestion.option1;
         option2Text.text = currentQuestion.option2;
         audioSource.clip = currentQuestion.audioClip;
-
-        messageText.text = ""; // Clear message at the start of each question
+        messageText.text = "";
     }
 
     void PlayAudio()
     {
         audioSource.Play();
+        currentRound.soundsPlayed++;
+        Debug.Log("Sound played. Total count: " + currentRound.soundsPlayed);
     }
 
     void CheckAnswer(string selectedAnswer)
     {
         Question currentQuestion = questions[currentQuestionIndex];
+        currentRound.questionsAttempted++;
 
         if (selectedAnswer == currentQuestion.correctAnswer)
         {
-            messageText.text = " Correct Answer!";
+            messageText.text = "Correct Answer!";
             messageText.color = Color.black;
-            messageAudioSource.PlayOneShot(correctSound); // Play correct answer sound
-            score++;  // Increment the score for the correct answer
-            scoreText.text = "Score: " + score;  // Update the score display
-            Debug.Log("Correct Answer!");
+            messageAudioSource.PlayOneShot(correctSound);
+            score++;
+            currentRound.correctAnswers++;
+            scoreText.text = "Score: " + score;
         }
         else
         {
-            messageText.text = " Wrong Answer";
+            messageText.text = "Wrong Answer";
             messageText.color = Color.red;
-            messageAudioSource.PlayOneShot(wrongSound); // Play wrong answer sound
-            Debug.Log("Wrong Answer!");
+            messageAudioSource.PlayOneShot(wrongSound);
         }
 
-        // Move to the next question after a short delay
         Invoke(nameof(NextQuestion), 1.5f);
     }
 
     void NextQuestion()
     {
         currentQuestionIndex++;
-
         if (currentQuestionIndex >= questions.Length)
         {
-            GameOver(); // Call GameOver when all questions are completed
+            GameOver();
         }
         else
         {
@@ -131,7 +141,30 @@ public class WordGameManager : MonoBehaviour
 
     void GameOver()
     {
-        gameOverImage.SetActive(true); // Show Game Over image
-        Debug.Log("Game Over! Displaying Game Over Image.");
+        gameOverImage.SetActive(true);
+        gameData.rounds.Add(currentRound);
+        SaveProgress();
+        Debug.Log("Game Over! Progress saved.");
+    }
+
+    void SaveProgress()
+    {
+        string json = JsonUtility.ToJson(gameData, true);
+        File.WriteAllText(savePath, json);
+        Debug.Log("Progress saved to: " + savePath);
+    }
+
+    void LoadProgress()
+    {
+        if (File.Exists(savePath))
+        {
+            string json = File.ReadAllText(savePath);
+            gameData = JsonUtility.FromJson<GameData>(json);
+            if (gameData == null)
+            {
+                gameData = new GameData();
+            }
+            Debug.Log("Progress loaded successfully.");
+        }
     }
 }
