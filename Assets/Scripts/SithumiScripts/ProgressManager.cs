@@ -4,17 +4,17 @@ using TMPro;
 
 public class ProgressManager : MonoBehaviour
 {
-    public static ProgressManager Instance;
+    public static ProgressManager Instance; // Singleton instance
 
-    public Slider progressBar;
-    public TextMeshProUGUI roundCounterText;
-    public Button skipButton; // Reference to the Skip Button
-    public EndGameMenu endGameMenu; // Reference to the EndGameMenu component
+    public Slider progressBar; // UI progress bar
+    public TextMeshProUGUI roundCounterText; // Displays the current round
+    public Button skipButton; // Skip button reference
+    public EndGameMenu endGameMenu; // Reference to the end game menu
 
-    private int progressValue = 0;
-    private int maxProgress = 5;
-    private int currentRound = 1;
-    private int maxRounds = 5;
+    private int progressValue = 0; // Current progress
+    private int maxProgress = 5; // Progress needed to complete a round
+    private int currentRound = 1; // Current round number
+    private int maxRounds = 5; // Total number of rounds
 
     // Track completion statistics
     private int roundsCompleted = 0;
@@ -22,6 +22,7 @@ public class ProgressManager : MonoBehaviour
 
     private void Awake()
     {
+        // Ensure only one instance exists
         if (Instance == null)
             Instance = this;
         else
@@ -33,17 +34,18 @@ public class ProgressManager : MonoBehaviour
         progressBar.value = progressValue;
         UpdateRoundCounter();
 
-        // Add button click listener
+        // Add skip button functionality
         if (skipButton != null)
         {
             skipButton.onClick.AddListener(SkipCurrentRound);
         }
 
-        // Find end menu if not assigned
+        // Find the end menu if not manually assigned
         if (endGameMenu == null)
             endGameMenu = FindObjectOfType<EndGameMenu>();
     }
 
+    // Updates the progress and checks if a round is completed
     public void UpdateProgress(int change)
     {
         progressValue = Mathf.Clamp(progressValue + change, 0, maxProgress);
@@ -56,25 +58,26 @@ public class ProgressManager : MonoBehaviour
         }
     }
 
+    // Handles the completion of a round
     private void HandleRoundComplete()
     {
         currentRound++;
 
         if (currentRound <= maxRounds)
         {
-            // Reset progress but continue game
+            // Reset progress and continue to the next round
             progressValue = 0;
             progressBar.value = progressValue;
             UpdateRoundCounter();
 
-            // Use GameManager to restart the round
+            // Restart the round using GameManager if available
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.RestartRound();
             }
             else
             {
-                // Fallback if GameManager not available
+                // Fallback: reset the letter spawner manually
                 LetterSpawner letterSpawner = FindObjectOfType<LetterSpawner>();
                 if (letterSpawner != null)
                 {
@@ -85,11 +88,12 @@ public class ProgressManager : MonoBehaviour
         }
         else
         {
-            // Game is completely finished after all rounds
+            // All rounds completed
             GameComplete();
         }
     }
 
+    // Updates the UI text for round count
     private void UpdateRoundCounter()
     {
         if (roundCounterText != null)
@@ -98,12 +102,13 @@ public class ProgressManager : MonoBehaviour
         }
     }
 
+    // Handles the completion of all rounds
     private void GameComplete()
     {
-        Debug.Log("Game Complete! All 5 rounds finished.");
+        Debug.Log("Game Complete! All rounds finished.");
         Debug.Log("Rounds completed: " + roundsCompleted + ", Rounds skipped: " + roundsSkipped);
 
-        // Stop the letter spawner
+        // Stop letter spawning and clear letters
         LetterSpawner letterSpawner = FindObjectOfType<LetterSpawner>();
         if (letterSpawner != null)
         {
@@ -111,19 +116,18 @@ public class ProgressManager : MonoBehaviour
             letterSpawner.ClearFallingLetters();
         }
 
-        // Show end menu with results
+        // Show the end game menu or restart if unavailable
         if (endGameMenu != null)
         {
             endGameMenu.ShowEndMenu(roundsCompleted, roundsSkipped);
         }
         else
         {
-            // Fallback if no end menu - just restart
             ResetGame();
         }
     }
 
-    // Public method to reset game state
+    // Resets the game state to the initial values
     public void ResetGame()
     {
         currentRound = 1;
@@ -134,13 +138,10 @@ public class ProgressManager : MonoBehaviour
         UpdateRoundCounter();
     }
 
-    // Skip current round method - unlimited skips
+    // Skips the current round and forces completion
     public void SkipCurrentRound()
     {
-        // Count this as a skipped round
         roundsSkipped++;
-
-        // Force complete the current round
         progressValue = maxProgress;
         progressBar.value = progressValue;
         HandleRoundComplete();

@@ -1,29 +1,25 @@
 using TMPro;
 using UnityEngine;
+
 public class AuthUIManager : MonoBehaviour
 {
     public static AuthUIManager instance;
+
     [Header("References")]
-    [SerializeField]
-    private GameObject checkingForAccountUI;
-    [SerializeField]
-    private GameObject loginUI;
-    [SerializeField]
-    private GameObject registerUI;
-    [SerializeField]
-    private GameObject verifyEmailUI;
-    [SerializeField]
-    private GameObject passwordResetUI;
-    [SerializeField]
-    private GameObject loadingUI;
-    [SerializeField]
-    private TMP_Text verifyEmailText;
+    [SerializeField] private GameObject checkingForAccountUI;
+    [SerializeField] private GameObject loginUI;
+    [SerializeField] private GameObject registerUI;
+    [SerializeField] private GameObject verifyEmailUI;
+    [SerializeField] private GameObject passwordResetUI;
+    [SerializeField] private GameObject loadingUI;
+    [SerializeField] private TMP_Text verifyEmailText;
+
     [Header("Verification Screen")]
-    [SerializeField]
-    private GameObject resendButton;
-    [SerializeField]
-    private GameObject backToLoginButton;
-    public void Awake()
+    [SerializeField] private GameObject resendButton;
+    [SerializeField] private GameObject backToLoginButton;
+
+    // Ensure only one instance of AuthUIManager exists
+    private void Awake()
     {
         if (instance == null)
         {
@@ -34,6 +30,8 @@ public class AuthUIManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
+    // Disables all UI elements to clear the screen
     private void ClearUI()
     {
         loginUI.SetActive(false);
@@ -44,34 +42,42 @@ public class AuthUIManager : MonoBehaviour
         loadingUI.SetActive(false);
         checkingForAccountUI.SetActive(false);
     }
-    // Password Reset Screen
+
+    // Displays the password reset screen
     public void PasswordResetScreen()
     {
         ClearUI();
         passwordResetUI.SetActive(true);
     }
-    // Show/Hide Loading Screen
+
+    // Controls visibility of the loading screen
     public void ShowLoading(bool show)
     {
         if (loadingUI != null)
             loadingUI.SetActive(show);
     }
+
+    // Displays the login screen 
     public void LoginScreen()
     {
-        // Stop checking for email verification when leaving the verification screen
         FirebaseManager.instance.StopVerificationCheck();
         ClearUI();
         loginUI.SetActive(true);
     }
+
+    // Displays the registration screen
     public void RegisterScreen()
     {
         ClearUI();
         registerUI.SetActive(true);
     }
+
+    // Handles email verification screen, updating UI based on email status
     public void AwaitVerification(bool emailSent, string email, string output)
     {
         ClearUI();
         verifyEmailUI.SetActive(true);
+
         if (emailSent)
         {
             verifyEmailText.text = $"Sent Email!\nPlease Verify {email}\n\nChecking for verification...";
@@ -80,13 +86,16 @@ public class AuthUIManager : MonoBehaviour
         {
             verifyEmailText.text = $"Email Not Sent: {output}\nPlease Verify {email}";
         }
-        // Make the resend button visible after 30 seconds
+
+        // Show the resend button after 30 seconds
         if (resendButton != null)
         {
             resendButton.SetActive(false);
             Invoke("ShowResendButton", 30f);
         }
     }
+
+    // Makes the resend button visible 
     private void ShowResendButton()
     {
         if (verifyEmailUI.activeSelf && resendButton != null)
@@ -94,11 +103,12 @@ public class AuthUIManager : MonoBehaviour
             resendButton.SetActive(true);
         }
     }
-    // Method for Resend button
+
+    // Resends the verification email 
     public void ResendVerificationEmail()
     {
         FirebaseManager.instance.ResendVerificationEmail();
-        // Hide resend button again
+
         if (resendButton != null)
         {
             resendButton.SetActive(false);
