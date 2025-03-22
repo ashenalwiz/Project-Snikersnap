@@ -7474,8 +7474,8 @@ MonoBehaviour:
   passwordResetUI: {fileID: 223543447}
   loadingUI: {fileID: 1007668293}
   verifyEmailText: {fileID: 1756666007}
-  resendButton: {fileID: 0}
-  backToLoginButton: {fileID: 0}
+  resendButton: {fileID: 1759370929}
+  backToLoginButton: {fileID: 1658749368}
 --- !u!1 &1945136151
 GameObject:
   m_ObjectHideFlags: 0
