@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 1076050683f99af42b2fb4f80f83ef31
+guid: efedac532b7f62e4aa426135f7f04bd7
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -844773298834026925
-    second: menu_bg_0
+      213: -5499859770287572352
+    second: 2201.w023.n001.1777B.p1.1777_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -109,43 +109,17 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WebGL
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: iOS
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: menu_bg_0
+      name: 2201.w023.n001.1777B.p1.1777_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 1599
-        height: 900
+        width: 6321
+        height: 2626
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -154,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 35e43471923c644f0800000000000000
-      internalID: -844773298834026925
+      spriteID: 08a3c8dada29ca3b0800000000000000
+      internalID: -5499859770287572352
       vertices: []
       indices: 
       edges: []
@@ -174,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      menu_bg_0: -844773298834026925
+      2201.w023.n001.1777B.p1.1777_0: -5499859770287572352
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
