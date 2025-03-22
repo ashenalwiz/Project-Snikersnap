@@ -2,60 +2,65 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PointerAlignmentChecker : MonoBehaviour
+namespace TracingScripts
 {
-    public GameObject myMask; 
-
-    // Update is called once per frame
-    void Update()
+    public class PointerAlignmentChecker : MonoBehaviour
     {
-        Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        public GameObject myMask;
 
-        pos.z = 0;
+        // Update is called once per frame
+        void Update()
+        {
+            Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
-        if(TouchMovementHandler.Instance.isAlignet)
-        {
-            GameObject go = Instantiate(myMask, pos, Quaternion.identity);
-            go.transform.parent = GameObject.Find("Masks").transform;
-        }
-        if(Input.GetMouseButtonUp(0) || (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Ended))
-        {
-            DestroyPointer();
-        }
-    }
+            pos.z = 0;
 
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if(collision.gameObject.tag == "myPath")
-        {
-            TouchMovementHandler.Instance.isAlignet = true;
-        }
-    }
-
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        if(collision.gameObject.tag == "myPath")
-        {
-            if(TouchMovementHandler.Instance.isAlignet)
+            if (TouchMovementHandler.Instance.isAligned)
             {
-                TouchMovementHandler.Instance.isAlignet = false;
+                GameObject go = Instantiate(myMask, pos, Quaternion.identity);
+                go.transform.parent = GameObject.Find("Masks").transform;
+            }
+
+            if (Input.GetMouseButtonUp(0) || (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Ended))
+            {
+                DestroyPointer();
             }
         }
-    }
 
-    void DestroyPointer()
-    {
-        if(TouchMovementHandler.Instance.PointerGO != null)
+        private void OnTriggerEnter2D(Collider2D collision)
         {
-            if(GameObject.Find("Masks").transform.childCount > 0)
+            if (collision.gameObject.tag == "myPath")
             {
-                foreach(Transform child in GameObject.Find("Masks").transform)
+                TouchMovementHandler.Instance.isAligned = true;
+            }
+        }
+
+        private void OnTriggerExit2D(Collider2D collision)
+        {
+            if (collision.gameObject.tag == "myPath")
+            {
+                if (TouchMovementHandler.Instance.isAligned)
                 {
-                    Destroy(child.gameObject);
+                    TouchMovementHandler.Instance.isAligned = false;
+                    DestroyPointer();
                 }
             }
+        }
 
-            Destroy(TouchMovementHandler.Instance.PointerGO);
+        void DestroyPointer()
+        {
+            if (TouchMovementHandler.Instance.PointerGO != null)
+            {
+                if (GameObject.Find("Masks").transform.childCount > 0)
+                {
+                    foreach (Transform child in GameObject.Find("Masks").transform)
+                    {
+                        Destroy(child.gameObject);
+                    }
+                }
+
+                TouchMovementHandler.Instance.DestroyPointer();
+            }
         }
     }
 }

@@ -16,6 +16,15 @@ public class BalloonSpawner : MonoBehaviour
         new Vector2(3f, -6.5f),
         new Vector2(6f, -7f)
     };
+    private Color[] balloonColors = {
+        new Color(1f, 0.2f, 0.2f), 
+    new Color(1f, 0.5f, 0.1f),  
+    new Color(1f, 0.7f, 0.8f),  
+    new Color(0.8f, 0.6f, 1f),  
+    new Color(0.2f, 0.4f, 1f), 
+    new Color(0.2f, 0.8f, 1f), 
+    new Color(0.9f, 0.75f, 1f) 
+    };
 
     void Start()
     {
@@ -38,6 +47,7 @@ public class BalloonSpawner : MonoBehaviour
             balloon.SetActive(true);
         }
     }
+
 
     public void SpawnBalloons()
     {
@@ -69,14 +79,26 @@ public class BalloonSpawner : MonoBehaviour
             GameObject balloon = Instantiate(balloonPrefab, spawnPos, Quaternion.identity);
             balloon.tag = "Balloon";
             Balloon balloonScript = balloon.GetComponent<Balloon>();
+
             if (balloonScript != null)
             {
                 balloonScript.spawner = this;
                 // First balloon gets the correct number, others get random numbers
                 balloonScript.SetNumber(i == 0 ? correctNumber : Random.Range(1, 11));
+
+                // Assign random color
+                Color randomColor = balloonColors[Random.Range(0, balloonColors.Length)];
+
+                // Apply the color to the balloon's SpriteRenderer
+                SpriteRenderer balloonRenderer = balloon.GetComponent<SpriteRenderer>();
+                if (balloonRenderer != null)
+                {
+                    balloonRenderer.color = randomColor;
+                }
             }
         }
     }
+
     // Called when a balloon is destroyed to track the remaining balloon
     public void BalloonDestroyed()
     {
