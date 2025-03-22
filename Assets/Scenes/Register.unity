@@ -2985,7 +2985,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &844686050
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4530,7 +4530,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1145230689
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5757,6 +5757,7 @@ MonoBehaviour:
   passwordResetUI: {fileID: 223543447}
   resetEmailField: {fileID: 701040828}
   resetEmailOutput: {fileID: 397723386}
+  verificationCheckDelay: 5
   loadingPanel: {fileID: 1007668293}
   registerUsername: {fileID: 2140028235}
   RegisterEmail: {fileID: 1893483264}
@@ -6546,8 +6547,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1637398919}
-        m_TargetAssemblyTypeName: FirebaseManager, Assembly-CSharp
+      - m_Target: {fileID: 1918292835}
+        m_TargetAssemblyTypeName: AuthUIManager, Assembly-CSharp
         m_MethodName: ResendVerificationEmail
         m_Mode: 1
         m_Arguments:
@@ -7473,6 +7474,8 @@ MonoBehaviour:
   passwordResetUI: {fileID: 223543447}
   loadingUI: {fileID: 1007668293}
   verifyEmailText: {fileID: 1756666007}
+  resendButton: {fileID: 0}
+  backToLoginButton: {fileID: 0}
 --- !u!1 &1945136151
 GameObject:
   m_ObjectHideFlags: 0

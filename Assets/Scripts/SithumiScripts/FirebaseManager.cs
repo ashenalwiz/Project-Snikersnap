@@ -34,12 +34,20 @@ public class FirebaseManager : MonoBehaviour
     private TMP_Text resetEmailOutput;
     [Space(5f)]
 
+    [Header("Email Verification")]
+    [SerializeField]
+    private float verificationCheckDelay = 5f; // Check every 5 seconds
+    private Coroutine verificationCheckCoroutine;
+    [Space(5f)]
+
     [Header("Loading")]
     [SerializeField]
     private GameObject loadingPanel;
 
     // for persistent login
     private const string RememberMeKey = "FirebaseRememberMe";
+    private const string SavedEmailKey = "FirebaseSavedEmail";
+    private const string SavedPasswordKey = "FirebaseSavedPassword";
 
     [Header("Register References")]
     [SerializeField]
@@ -146,8 +154,7 @@ public class FirebaseManager : MonoBehaviour
         ShowLoading(true);
 
         // Clear remember me preference
-        PlayerPrefs.SetInt(RememberMeKey, 0);
-        PlayerPrefs.Save();
+        ClearSavedCredentials();
 
         auth.SignOut();
 
@@ -159,15 +166,85 @@ public class FirebaseManager : MonoBehaviour
     }
 
     // Remember Me functionality
-    private void UpdateRememberMePreference(bool remember)
+    private void SaveCredentials(string email, string password)
     {
-        PlayerPrefs.SetInt(RememberMeKey, remember ? 1 : 0);
+        PlayerPrefs.SetInt(RememberMeKey, 1);
+        PlayerPrefs.SetString(SavedEmailKey, email);
+        // Note: This is not secure for a production app. Consider using encryption.
+        PlayerPrefs.SetString(SavedPasswordKey, password);
+        PlayerPrefs.Save();
+    }
+
+    private void ClearSavedCredentials()
+    {
+        PlayerPrefs.SetInt(RememberMeKey, 0);
+        PlayerPrefs.DeleteKey(SavedEmailKey);
+        PlayerPrefs.DeleteKey(SavedPasswordKey);
         PlayerPrefs.Save();
     }
 
     public void RememberMeToggleChanged()
     {
-        UpdateRememberMePreference(rememberMeToggle.isOn);
+        // This is now handled during login
+    }
+
+    // Public method to resend verification email
+    public void ResendVerificationEmail()
+    {
+        if (user != null)
+        {
+            StartCoroutine(sendVerificationEmail());
+        }
+    }
+
+    // Method to start checking for verification
+    public void StartVerificationCheck()
+    {
+        // Stop any existing verification check
+        StopVerificationCheck();
+
+        // Start a new verification check
+        verificationCheckCoroutine = StartCoroutine(CheckEmailVerificationStatus());
+    }
+
+    // Method to stop checking for verification
+    public void StopVerificationCheck()
+    {
+        if (verificationCheckCoroutine != null)
+        {
+            StopCoroutine(verificationCheckCoroutine);
+            verificationCheckCoroutine = null;
+        }
+    }
+
+    // Coroutine to periodically check verification status
+    private IEnumerator CheckEmailVerificationStatus()
+    {
+        while (true)
+        {
+            if (user != null)
+            {
+                // Reload the user to get updated info
+                var reloadTask = user.ReloadAsync();
+                yield return new WaitUntil(() => reloadTask.IsCompleted);
+
+                // Check if email is verified
+                if (user.IsEmailVerified)
+                {
+                    Debug.Log("Email verified! Proceeding to game.");
+                    FirebaseGameManager.instance.ChangeScene(1);
+                    yield break;
+                }
+            }
+            else
+            {
+                // No user logged in, stop checking
+                yield break;
+            }
+
+            // Wait before checking again
+            yield return new WaitForSeconds(verificationCheckDelay);
+        }
     }
 
     // Validation methods
@@ -227,8 +304,31 @@ public class FirebaseManager : MonoBehaviour
     private IEnumerator CheckAutoLogin()
     {
         yield return new WaitForEndOfFrame();
-        if (user != null)
+
+        // Check if we have a user and Remember Me is enabled
+        if (PlayerPrefs.GetInt(RememberMeKey, 0) == 1)
         {
+            string savedEmail = PlayerPrefs.GetString(SavedEmailKey, "");
+            string savedPassword = PlayerPrefs.GetString(SavedPasswordKey, "");
+
+            if (!string.IsNullOrEmpty(savedEmail) && !string.IsNullOrEmpty(savedPassword))
+            {
+                // Populate the login fields
+                if (loginEmail != null) loginEmail.text = savedEmail;
+                if (loginPassword != null) loginPassword.text = savedPassword;
+                if (rememberMeToggle != null) rememberMeToggle.isOn = true;
+
+                // Attempt auto-login
+                yield return StartCoroutine(loginLogic(savedEmail, savedPassword, true));
+            }
+            else
+            {
+                AuthUIManager.instance.LoginScreen();
+            }
+        }
+        else if (user != null)
+        {
+            // We have a user but Remember Me is not enabled
             var reloadUserTask = user.ReloadAsync();
             yield return new WaitUntil(predicate: () => reloadUserTask.IsCompleted);
             AutoLogin();
@@ -286,7 +386,7 @@ public class FirebaseManager : MonoBehaviour
 
     public void LoginButton()
     {
-        StartCoroutine(loginLogic(loginEmail.text, loginPassword.text));
+        StartCoroutine(loginLogic(loginEmail.text, loginPassword.text, rememberMeToggle.isOn));
     }
 
     public void RegisterButton()
@@ -294,8 +394,8 @@ public class FirebaseManager : MonoBehaviour
         StartCoroutine(registerLogic(registerUsername.text, RegisterEmail.text, RegisterPassword.text, RegisterConfirmPassword.text));
     }
 
-    // Login method with Remember Me
-    private IEnumerator loginLogic(string email, string password)
+    // Updated login method with explicit Remember Me parameter
+    private IEnumerator loginLogic(string email, string password, bool rememberMe)
     {
         // Show loading indicator
         ShowLoading(true);
@@ -350,8 +450,15 @@ public class FirebaseManager : MonoBehaviour
         }
         else
         {
-            // Save remember me preference
-            UpdateRememberMePreference(rememberMeToggle.isOn);
+            // Handle Remember Me preference
+            if (rememberMe)
+            {
+                SaveCredentials(email, password);
+            }
+            else
+            {
+                ClearSavedCredentials();
+            }
 
             if (user.IsEmailVerified)
             {
@@ -464,11 +571,6 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
-    public void ResendVerificationEmail()
-    {
-        StartCoroutine(sendVerificationEmail());
-    }
-
     private IEnumerator sendVerificationEmail()
     {
         if (user != null)
@@ -501,6 +603,8 @@ public class FirebaseManager : MonoBehaviour
             else
             {
                 AuthUIManager.instance.AwaitVerification(true, user.Email, null);
+                // Start checking for verification
+                StartVerificationCheck();
                 Debug.Log("Email Send Successfully");
             }
         }

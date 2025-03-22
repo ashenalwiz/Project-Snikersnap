@@ -21,6 +21,12 @@ public class AuthUIManager : MonoBehaviour
     [SerializeField]
     private TMP_Text verifyEmailText;
 
+    [Header("Verification Screen")]
+    [SerializeField]
+    private GameObject resendButton;
+    [SerializeField]
+    private GameObject backToLoginButton;
+
     public void Awake()
     {
         if (instance == null)
@@ -60,6 +66,9 @@ public class AuthUIManager : MonoBehaviour
 
     public void LoginScreen()
     {
+        // Stop checking for email verification when leaving the verification screen
+        FirebaseManager.instance.StopVerificationCheck();
+
         ClearUI();
         loginUI.SetActive(true);
     }
@@ -74,13 +83,42 @@ public class AuthUIManager : MonoBehaviour
     {
         ClearUI();
         verifyEmailUI.SetActive(true);
+
         if (emailSent)
         {
-            verifyEmailText.text = $"Sent Email!\nPlease Verify {email}";
+            verifyEmailText.text = $"Sent Email!\nPlease Verify {email}\n\nChecking for verification...";
         }
         else
         {
             verifyEmailText.text = $"Email Not Sent: {output}\nPlease Verify {email}";
+        }
+
+        // Make the resend button visible after 30 seconds
+        if (resendButton != null)
+        {
+            resendButton.SetActive(false);
+            Invoke("ShowResendButton", 30f);
+        }
+    }
+
+    private void ShowResendButton()
+    {
+        if (verifyEmailUI.activeSelf && resendButton != null)
+        {
+            resendButton.SetActive(true);
+        }
+    }
+
+    // Method for Resend button
+    public void ResendVerificationEmail()
+    {
+        FirebaseManager.instance.ResendVerificationEmail();
+
+        // Hide resend button again
+        if (resendButton != null)
+        {
+            resendButton.SetActive(false);
+            Invoke("ShowResendButton", 30f);
         }
     }
 }
