@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      red-vintage-convertible-car-cartoon-style 1_0: -485419045791379805
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
