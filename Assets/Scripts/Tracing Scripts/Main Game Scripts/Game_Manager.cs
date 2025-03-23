@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace TracingScripts
 {
-    public class Game_Manager : MonoBehaviour
+    public class Game_Manager: MonoBehaviour
     {
         public static Game_Manager Instance;
         public bool isGameEnded;

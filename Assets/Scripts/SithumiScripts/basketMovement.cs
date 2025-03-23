@@ -9,20 +9,21 @@ public class BasketController : MonoBehaviour
     public Color defaultColor = Color.white;
 
     [Header("Sound Effects")]
-    public AudioSource correctLetterSound; // Sound for catching correct letter
-    public AudioSource incorrectLetterSound; // Sound for catching incorrect letter
+    public AudioSource correctLetterSound; // Sound for catching the correct letter
+    public AudioSource incorrectLetterSound; // Sound for catching the incorrect letter
 
-    private float colorResetTime = 0.5f;
-    private Vector3 offset;
-    private bool isDragging = false;
-    private float screenWidthInUnits;
+    private float colorResetTime = 0.5f; // Time before basket color resets
+    private Vector3 offset; // Offset for touch-based dragging
+    private bool isDragging = false; // Tracks if the basket is being dragged
+    private float screenWidthInUnits; // Screen width in world units
 
     void Start()
     {
+        // Calculate screen width in world units
         float screenHalfWidth = Camera.main.orthographicSize * Screen.width / Screen.height;
         screenWidthInUnits = screenHalfWidth * 2;
 
-        // Optional: Log a warning if sounds are not assigned
+        // Warn if sound effects are missing
         if (correctLetterSound == null)
             Debug.LogWarning("Correct letter sound is not assigned!");
         if (incorrectLetterSound == null)
@@ -31,7 +32,7 @@ public class BasketController : MonoBehaviour
 
     void Update()
     {
-        HandleTouchInput();
+        HandleTouchInput(); // Handle basket movement using touch input
     }
 
     void HandleTouchInput()
@@ -40,11 +41,12 @@ public class BasketController : MonoBehaviour
         {
             Touch touch = Input.GetTouch(0);
             Vector3 touchPosition = Camera.main.ScreenToWorldPoint(new Vector3(touch.position.x, touch.position.y, 0));
-            touchPosition.z = transform.position.z;
+            touchPosition.z = transform.position.z; // Maintain original Z position
 
             switch (touch.phase)
             {
                 case TouchPhase.Began:
+                    // Start dragging if the touch is on the basket
                     if (GetComponent<Collider2D>() == Physics2D.OverlapPoint(touchPosition))
                     {
                         isDragging = true;
@@ -53,6 +55,7 @@ public class BasketController : MonoBehaviour
                     break;
 
                 case TouchPhase.Moved:
+                    // Move the basket while dragging, within screen limits
                     if (isDragging)
                     {
                         float clampedX = Mathf.Clamp(touchPosition.x + offset.x, -screenWidthInUnits / 2, screenWidthInUnits / 2);
@@ -62,7 +65,7 @@ public class BasketController : MonoBehaviour
 
                 case TouchPhase.Ended:
                 case TouchPhase.Canceled:
-                    isDragging = false;
+                    isDragging = false; // Stop dragging when touch is released
                     break;
             }
         }
@@ -74,13 +77,13 @@ public class BasketController : MonoBehaviour
 
         if (letterText != null)
         {
-            char fallingLetter = letterText.text[0]; // Get falling letter
-            char mainLetter = FindObjectOfType<LetterSpawner>().mainLetterText.text[0]; // Get main letter
+            char fallingLetter = letterText.text[0]; // Get the letter from the falling object
+            char mainLetter = FindObjectOfType<LetterSpawner>().mainLetterText.text[0]; // Get the target letter
 
             if (char.ToLower(fallingLetter) == char.ToLower(mainLetter))
             {
                 basketRenderer.color = correctColor; // Glow green for correct letter
-                ProgressManager.Instance.UpdateProgress(1); // Increase progress
+                ProgressManager.Instance.UpdateProgress(1); // Increase progress score
 
                 // Play correct letter sound
                 if (correctLetterSound != null)
@@ -89,20 +92,20 @@ public class BasketController : MonoBehaviour
             else
             {
                 basketRenderer.color = incorrectColor; // Glow red for incorrect letter
-                ProgressManager.Instance.UpdateProgress(-1); // Decrease progress
+                ProgressManager.Instance.UpdateProgress(-1); // Decrease progress score
 
                 // Play incorrect letter sound
                 if (incorrectLetterSound != null)
                     incorrectLetterSound.Play();
             }
 
-            Destroy(other.gameObject); // Remove caught letter
-            Invoke(nameof(ResetColor), colorResetTime);
+            Destroy(other.gameObject); // Remove caught letter from the scene
+            Invoke(nameof(ResetColor), colorResetTime); // Reset basket color after delay
         }
     }
 
     private void ResetColor()
     {
-        basketRenderer.color = defaultColor; // Restore default color
+        basketRenderer.color = defaultColor; // Restore default basket color
     }
 }

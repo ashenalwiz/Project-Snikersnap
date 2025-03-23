@@ -56,7 +56,7 @@ public class WordGameManager : MonoBehaviour
 
     void Start()
     {
-        savePath = Path.Combine(Application.dataPath, "GameData/progress.json");
+        savePath = Path.Combine(Application.persistentDataPath, "Task7UserProgress.json"); // Updated path
         LoadProgress();
         gameOverImage.SetActive(false);
         scoreText.text = "Score: " + score;
@@ -144,13 +144,14 @@ public class WordGameManager : MonoBehaviour
         gameOverImage.SetActive(true);
         gameData.rounds.Add(currentRound);
         SaveProgress();
-        Debug.Log("Game Over! Progress saved.");
+        FirebaseProgressManager.Instance.UploadProgressToFirebase();  // Add this line
+        Debug.Log("Game Over! Progress saved and uploaded to Firebase.");
     }
 
     void SaveProgress()
     {
         string json = JsonUtility.ToJson(gameData, true);
-        File.WriteAllText(savePath, json);
+        File.WriteAllText(savePath, json); // Save to persistentDataPath
         Debug.Log("Progress saved to: " + savePath);
     }
 
@@ -164,7 +165,11 @@ public class WordGameManager : MonoBehaviour
             {
                 gameData = new GameData();
             }
-            Debug.Log("Progress loaded successfully.");
+            Debug.Log("Progress loaded successfully from: " + savePath);
+        }
+        else
+        {
+            Debug.Log("No progress file found at: " + savePath);
         }
     }
 }

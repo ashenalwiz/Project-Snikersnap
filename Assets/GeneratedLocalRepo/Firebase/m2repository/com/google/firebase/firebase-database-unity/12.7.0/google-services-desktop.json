@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "616994379950",
+    "project_id": "readaroo-project",
+    "firebase_url": "https://readaroo-project-default-rtdb.firebaseio.com",
+    "storage_bucket": "readaroo-project.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:616994379950:android:3cee74518a407bd080753f",
+        "android_client_info": {
+          "package_name": "com.DefaultCompany.com.unity.template.mobile2D"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCcfxmRY_EPAc5s1b7zGoX4oqRZXKMVM58"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

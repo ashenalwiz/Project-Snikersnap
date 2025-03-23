@@ -2,6 +2,8 @@ using UnityEngine;
 using System.Collections;
 using Firebase;
 using Firebase.Auth;
+using Firebase.Database;
+using System.IO;
 using TMPro;
 using UnityEngine.UI;
 
@@ -65,6 +67,15 @@ public class FirebaseManager : MonoBehaviour
     private string lastRegisteredEmail;
     private string lastRegisteredPassword;
     private bool shouldRememberAfterRegistration = false;
+
+    // List of game progress file names - synchronized with FirebaseProgressManager
+    private readonly string[] progressFileNames = {
+        "Task2UserProgress",
+        "Task3UserProgress",
+        "Task5UserProgress",
+        "Task7UserProgress",
+        "Task8UserProgress"
+    };
 
     public void Awake()
     {
@@ -158,6 +169,12 @@ public class FirebaseManager : MonoBehaviour
     {
         ShowLoading(true);
 
+        // Sync any remaining data before logout
+        if (FirebaseProgressManager.Instance != null)
+        {
+            FirebaseProgressManager.Instance.UploadProgressToFirebase();
+        }
+
         // Clear remember me preference
         ClearSavedCredentials();
 
@@ -250,6 +267,12 @@ public class FirebaseManager : MonoBehaviour
                     {
                         // Clear credentials if Remember Me is not checked
                         ClearSavedCredentials();
+                    }
+
+                    // Notify FirebaseProgressManager about user login
+                    if (FirebaseProgressManager.Instance != null)
+                    {
+                        FirebaseProgressManager.Instance.OnUserLoggedIn(user.UserId);
                     }
 
                     FirebaseGameManager.instance.ChangeScene(1);
@@ -368,6 +391,12 @@ public class FirebaseManager : MonoBehaviour
             {
                 if (user.IsEmailVerified)
                 {
+                    // Notify FirebaseProgressManager about user login
+                    if (FirebaseProgressManager.Instance != null)
+                    {
+                        FirebaseProgressManager.Instance.OnUserLoggedIn(user.UserId);
+                    }
+                    
                     FirebaseGameManager.instance.ChangeScene(1);
                 }
                 else
@@ -494,8 +523,11 @@ public class FirebaseManager : MonoBehaviour
 
             if (user.IsEmailVerified)
             {
-                yield return new WaitForSeconds(1f);
-                FirebaseGameManager.instance.ChangeScene(1);
+                // Load user progress data before changing scene with callback
+                yield return StartCoroutine(LoadUserProgressData(user.UserId, () => {
+                    // Now we can safely change scenes
+                    FirebaseGameManager.instance.ChangeScene(1);
+                }));
             }
             else
             {
@@ -643,6 +675,115 @@ public class FirebaseManager : MonoBehaviour
                 StartVerificationCheck();
                 Debug.Log("Email Sent Successfully");
             }
+        }
+    }
+
+    private IEnumerator LoadUserProgressData(string userId, System.Action onComplete = null)
+    {
+        DatabaseReference reference = FirebaseDatabase.DefaultInstance.RootReference;
+        int totalFiles = progressFileNames.Length;
+        int completedFiles = 0;
+
+        foreach (string progressFile in progressFileNames)
+        {
+            string localFilePath = Path.Combine(Application.persistentDataPath, progressFile + ".json");
+            bool hasLocalFile = File.Exists(localFilePath);
+            string localJson = null;
+
+            // Read local file if it exists
+            if (hasLocalFile)
+            {
+                try
+                {
+                    localJson = File.ReadAllText(localFilePath);
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogError($"Error reading local file {progressFile}: {ex.Message}");
+                }
+            }
+
+            // Get Firebase data
+            var dataTask = reference.Child("users").Child(userId).Child("progress").Child(progressFile).GetValueAsync();
+            yield return new WaitUntil(() => dataTask.IsCompleted);
+
+            if (dataTask.Exception != null)
+            {
+                Debug.LogWarning($"Failed to load {progressFile}: {dataTask.Exception.Message}");
+                
+                // If we have local data but couldn't fetch Firebase data, upload local data
+                if (hasLocalFile && !string.IsNullOrEmpty(localJson))
+                {
+                    var uploadTask = reference.Child("users").Child(userId).Child("progress")
+                        .Child(progressFile).SetRawJsonValueAsync(localJson);
+                    yield return new WaitUntil(() => uploadTask.IsCompleted);
+
+                    if (uploadTask.Exception != null)
+                    {
+                        Debug.LogError($"Failed to upload local {progressFile}: {uploadTask.Exception.Message}");
+                    }
+                    else
+                    {
+                        Debug.Log($"Successfully uploaded local {progressFile} to Firebase");
+                    }
+                }
+                
+                completedFiles++;
+                continue;
+            }
+
+            DataSnapshot snapshot = dataTask.Result;
+            
+            if (snapshot.Exists)
+            {
+                string firebaseJson = snapshot.GetRawJsonValue();
+                
+                // Compare timestamps or version numbers if included in the JSON
+                // For this example, we'll use a simple string comparison
+                if (hasLocalFile && localJson != firebaseJson)
+                {
+                    // TODO: Implement proper conflict resolution strategy
+                    // For now, we'll keep the Firebase version
+                    try
+                    {
+                        File.WriteAllText(localFilePath, firebaseJson);
+                        Debug.Log($"Updated local {progressFile} with Firebase data");
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Debug.LogError($"Error saving {progressFile} data: {ex.Message}");
+                    }
+                }
+            }
+            else if (hasLocalFile && !string.IsNullOrEmpty(localJson))
+            {
+                // No data in Firebase but we have local data, so upload it
+                var uploadTask = reference.Child("users").Child(userId).Child("progress")
+                    .Child(progressFile).SetRawJsonValueAsync(localJson);
+                yield return new WaitUntil(() => uploadTask.IsCompleted);
+
+                if (uploadTask.Exception != null)
+                {
+                    Debug.LogError($"Failed to upload local {progressFile}: {uploadTask.Exception.Message}");
+                }
+                else
+                {
+                    Debug.Log($"Successfully uploaded local {progressFile} to Firebase");
+                }
+            }
+            else
+            {
+                Debug.Log($"No data found for {progressFile}");
+            }
+
+            completedFiles++;
+        }
+
+        Debug.Log($"All progress data processed ({completedFiles}/{totalFiles} files)");
+
+        if (onComplete != null)
+        {
+            onComplete();
         }
     }
 }

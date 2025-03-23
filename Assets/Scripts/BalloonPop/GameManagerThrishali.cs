@@ -234,32 +234,49 @@ public class GameManagerThrishali : MonoBehaviour
     }
     private void SaveSessionData(float overallAccuracy)
     {
-        string filePath = Application.persistentDataPath + "/Task4UserProgress.json"; // Updated file name
-
-        // Load existing session data if file exists
-        SessionDataList sessionDataList = new SessionDataList();
-        if (File.Exists(filePath))
+        try
         {
-            string json = File.ReadAllText(filePath);
-            sessionDataList = JsonUtility.FromJson<SessionDataList>(json);
+            string filePath = Application.persistentDataPath + "/Task5UserProgress.json";
+
+            // Load existing session data if file exists
+            SessionDataList sessionDataList = new SessionDataList();
+            if (File.Exists(filePath))
+            {
+                string json = File.ReadAllText(filePath);
+                sessionDataList = JsonUtility.FromJson<SessionDataList>(json);
+            }
+
+            // Create new session entry
+            SessionData newSession = new SessionData
+            {
+                sessionID = sessionDataList.sessions.Count + 1,
+                date = System.DateTime.Now.ToString("yyyy-MM-dd"),
+                accuracy = overallAccuracy
+            };
+
+            // Add to session list
+            sessionDataList.sessions.Add(newSession);
+
+            // Save to JSON file
+            string updatedJson = JsonUtility.ToJson(sessionDataList, true);
+            File.WriteAllText(filePath, updatedJson);
+
+            // Try to upload to Firebase if available
+            if (FirebaseProgressManager.Instance != null)
+            {
+                FirebaseProgressManager.Instance.UploadProgressToFirebase();
+            }
+            else
+            {
+                Debug.LogWarning("FirebaseProgressManager instance not found. Progress will only be saved locally.");
+            }
+
+            Debug.Log("Session saved successfully: " + updatedJson);
         }
-
-        // Create new session entry
-        SessionData newSession = new SessionData
+        catch (System.Exception ex)
         {
-            sessionID = sessionDataList.sessions.Count + 1,
-            date = System.DateTime.Now.ToString("yyyy-MM-dd"),
-            accuracy = overallAccuracy
-        };
-
-        // Add to session list (Keep all past sessions)
-        sessionDataList.sessions.Add(newSession);
-
-        // Save back to JSON file
-        string updatedJson = JsonUtility.ToJson(sessionDataList, true);
-        File.WriteAllText(filePath, updatedJson);
-
-        Debug.Log("Session saved: " + updatedJson);
+            Debug.LogError($"Error saving session data: {ex.Message}");
+        }
     }
 
     public void ShowProgressDetails()
@@ -329,7 +346,7 @@ public class GameManagerThrishali : MonoBehaviour
     }
     private void ShowRecentSessions()
     {
-        string filePath = Application.persistentDataPath + "/Task4UserProgress.json"; // Updated file name
+        string filePath = Application.persistentDataPath + "/Task5UserProgress.json"; // Updated file name
 
         if (!File.Exists(filePath))
         {
