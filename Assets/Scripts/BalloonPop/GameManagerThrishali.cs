@@ -389,7 +389,7 @@ public class GameManagerThrishali : MonoBehaviour
     }
     public void ExitGame()
     {
-        Application.Quit();
+        SceneManager.LoadScene("MainMenu");
     }
     public void PlayNumberAudio(int number)
     {

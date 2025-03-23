@@ -144,8 +144,9 @@ public class LetterSoundMatchUp : MonoBehaviour
         for (int i = 0; i < audioButtons.Length; i++)
         {
             buttonToLetterMap[i] = letterCombinations[i];
+
             if (audioButtons[i].GetComponentInChildren<TextMeshProUGUI>())
-                audioButtons[i].GetComponentInChildren<TextMeshProUGUI>().text = "Play Sound";
+                audioButtons[i].GetComponentInChildren<TextMeshProUGUI>().text = $"Play Sound {i + 1}";
 
             if (letterGroups[i].GetComponentInChildren<TextMeshProUGUI>())
                 letterGroups[i].GetComponentInChildren<TextMeshProUGUI>().text = shuffledCombinations[i];
@@ -154,6 +155,7 @@ public class LetterSoundMatchUp : MonoBehaviour
             audioButtons[i].onClick.AddListener(() => SelectAudioButton(index));
             letterGroups[i].onClick.AddListener(() => CheckMatch(index));
         }
+
     }
 
     string GenerateRandomLetterCombination()
@@ -249,7 +251,7 @@ public class LetterSoundMatchUp : MonoBehaviour
         scoreText.gameObject.SetActive(false);
         totalScore++; // Increment score after the round is completed
 
-        int lastRound = 2; // Change this to your desired last round
+        int lastRound = 2; //10
 
         if (currentRound >= lastRound) // End the game at the final round
 
