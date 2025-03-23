@@ -2,6 +2,7 @@
   "project_info": {
     "project_number": "616994379950",
     "project_id": "readaroo-project",
+    "firebase_url": "https://readaroo-project-default-rtdb.firebaseio.com",
     "storage_bucket": "readaroo-project.firebasestorage.app"
   },
   "client": [

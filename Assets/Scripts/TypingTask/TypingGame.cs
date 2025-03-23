@@ -476,6 +476,7 @@ public class TypingGame : MonoBehaviour
 
             // Write to file
             File.WriteAllText(fullPath, json);
+
             Debug.Log($"Successfully saved data to: {fullPath}");
 
             // Verify the file was written correctly
@@ -498,6 +499,9 @@ public class TypingGame : MonoBehaviour
         {
             Debug.LogError($"Error saving data: {ex.Message}\nStack trace: {ex.StackTrace}");
         }
+
+        FirebaseProgressManager.Instance.UploadProgressToFirebase();
+
     }
 
     void LoadPreviousData()
@@ -555,6 +559,7 @@ public class TypingGame : MonoBehaviour
                 }
 
                 File.WriteAllText(filePath, json);
+
                 Debug.Log($"Data saved successfully to: {filePath}");
             }
             catch (Exception ex)

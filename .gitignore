@@ -73,3 +73,7 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 /Assets/Editor Default Resources/Firebase
 /Assets/Firebase
+/.utmp
+.utmp/tools/release/arm64-v8a/compile_commands.json
+.utmp/tools/release/arm64-v8a/compile_commands.json
+/.utmp

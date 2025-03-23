@@ -864,7 +864,13 @@ PlayerSettings:
   windowsGamepadBackendHint: 0
   cloudProjectId: dc4a13b9-04bb-4d65-b219-da2dc91237eb
   framebufferDepthMemorylessMode: 0
-  qualitySettingsNames: []
+  qualitySettingsNames:
+  - Very Low
+  - Low
+  - Medium
+  - High
+  - Very High
+  - Ultra
   projectName: Project-Snikersnap
   organizationId: thrishali
   cloudEnabled: 0

@@ -2,83 +2,84 @@ using UnityEngine;
 using System.Collections;
 using Firebase;
 using Firebase.Auth;
+using Firebase.Database;
+using System.IO;
 using TMPro;
 using UnityEngine.UI;
-using System.Net;
-using UnityEngine.SocialPlatforms.Impl;
 
-// Manages all Firebase authentication operations including login, registration,
-// email verification, password reset, and persistent login.
 public class FirebaseManager : MonoBehaviour
 {
-    // Singleton instance for global access
     public static FirebaseManager instance;
 
     [Header("Firebase")]
-    public FirebaseAuth auth;       // Firebase Authentication instance
-    public FirebaseUser user;       // Current Firebase user
+    public FirebaseAuth auth;
+    public FirebaseUser user;
     [Space(5f)]
 
     [Header("Login References")]
     [SerializeField]
-    private TMP_InputField loginEmail;      // Input field for login email
+    private TMP_InputField loginEmail;
     [SerializeField]
-    private TMP_InputField loginPassword;   // Input field for login password
+    private TMP_InputField loginPassword;
     [SerializeField]
-    private TMP_Text loginOutputText;       // Text to display login results/errors
+    private TMP_Text loginOutputText;
     [SerializeField]
-    private Toggle rememberMeToggle;        // Toggle for "Remember Me" functionality
+    private Toggle rememberMeToggle;
     [Space(5f)]
 
     [Header("Password Reset")]
     [SerializeField]
-    private GameObject passwordResetUI;     // UI panel for password reset
+    private GameObject passwordResetUI;
     [SerializeField]
-    private TMP_InputField resetEmailField; // Input field for reset email
+    private TMP_InputField resetEmailField;
     [SerializeField]
-    private TMP_Text resetEmailOutput;      // Text to display reset results/errors
+    private TMP_Text resetEmailOutput;
     [Space(5f)]
 
     [Header("Email Verification")]
     [SerializeField]
-    private float verificationCheckDelay = 5f; // Interval to check verification status
-    private Coroutine verificationCheckCoroutine; // Reference to verification check coroutine
+    private float verificationCheckDelay = 5f; // Check every 5 seconds
+    private Coroutine verificationCheckCoroutine;
     [Space(5f)]
 
     [Header("Loading")]
     [SerializeField]
-    private GameObject loadingPanel;        // Loading indicator panel
+    private GameObject loadingPanel;
 
-    // PlayerPrefs keys for persistent login
+    // for persistent login
     private const string RememberMeKey = "FirebaseRememberMe";
     private const string SavedEmailKey = "FirebaseSavedEmail";
     private const string SavedPasswordKey = "FirebaseSavedPassword";
 
     [Header("Register References")]
     [SerializeField]
-    private TMP_InputField registerUsername;        // Input field for registration username
+    private TMP_InputField registerUsername;
     [SerializeField]
-    private TMP_InputField RegisterEmail;           // Input field for registration email
+    private TMP_InputField RegisterEmail;
     [SerializeField]
-    private TMP_InputField RegisterPassword;        // Input field for registration password
+    private TMP_InputField RegisterPassword;
     [SerializeField]
-    private TMP_InputField RegisterConfirmPassword; // Input field to confirm password
+    private TMP_InputField RegisterConfirmPassword;
     [SerializeField]
-    private TMP_Text registerOutputText;            // Text to display registration results/errors
+    private TMP_Text registerOutputText;
 
-    // Cache registration info for potential "Remember Me" after verification
+    // Store registration info for potential "Remember Me" after verification
     private string lastRegisteredEmail;
     private string lastRegisteredPassword;
     private bool shouldRememberAfterRegistration = false;
 
-    // Awake is called when the script instance is being loaded.
-    // Sets up the singleton pattern.
+    // List of game progress file names - synchronized with FirebaseProgressManager
+    private readonly string[] progressFileNames = {
+        "Task2UserProgress",
+        "Task3UserProgress",
+        "Task5UserProgress",
+        "Task7UserProgress",
+        "Task8UserProgress"
+    };
+
     public void Awake()
     {
-        // Make this object persistent across scenes
         DontDestroyOnLoad(gameObject);
-
-        // Implement singleton pattern
         if (instance == null)
         {
             instance = this;
@@ -90,27 +91,22 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
-    // Start is called before the first frame update.
-    // Initializes Firebase and checks dependencies.
     private void Start()
     {
         StartCoroutine(CheckAndFixDependancies());
     }
 
-    // Opens the password reset UI screen.
+    // Password reset methods
     public void OpenPasswordResetUI()
     {
         AuthUIManager.instance.PasswordResetScreen();
     }
 
-    // Initiates the password reset process when button is clicked.
     public void PasswordResetButton()
     {
         StartCoroutine(SendPasswordResetEmail(resetEmailField.text));
     }
 
-    // Sends a password reset email to the specified address.
-    // email: Email address to send the reset link to
     private IEnumerator SendPasswordResetEmail(string email)
     {
         // Show loading indicator
@@ -124,20 +120,17 @@ public class FirebaseManager : MonoBehaviour
             yield break;
         }
 
-        // Send password reset email
         var resetTask = auth.SendPasswordResetEmailAsync(email);
         yield return new WaitUntil(() => resetTask.IsCompleted);
 
         ShowLoading(false);
 
-        // Handle any errors that occurred
         if (resetTask.Exception != null)
         {
             FirebaseException firebaseException = (FirebaseException)resetTask.Exception.GetBaseException();
             AuthError error = (AuthError)firebaseException.ErrorCode;
             string output = "Unknown Error, Please try again";
 
-            // Convert Firebase error codes to user-friendly messages
             switch (error)
             {
                 case AuthError.InvalidEmail:
@@ -155,35 +148,36 @@ public class FirebaseManager : MonoBehaviour
         }
         else
         {
-            // Success message and return to login screen after delay
             resetEmailOutput.text = "Password reset email sent!";
             StartCoroutine(ReturnToLoginAfterDelay(3f));
         }
     }
 
-    // Returns to login screen after specified delay.
-    // delay: Time in seconds to wait before switching screens
     private IEnumerator ReturnToLoginAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
         AuthUIManager.instance.LoginScreen();
     }
 
-    // Logs out the current user.
+    // Logout functionality
     public void LogoutUser()
     {
         StartCoroutine(LogoutLogic());
     }
 
-    // Handles the logout process.
     private IEnumerator LogoutLogic()
     {
         ShowLoading(true);
 
-        // Clear saved credentials when logging out
+        // Sync any remaining data before logout
+        if (FirebaseProgressManager.Instance != null)
+        {
+            FirebaseProgressManager.Instance.UploadProgressToFirebase();
+        }
+
+        // Clear remember me preference
         ClearSavedCredentials();
 
-        // Sign out from Firebase
         auth.SignOut();
 
         // Wait for auth state to update
@@ -193,9 +187,7 @@ public class FirebaseManager : MonoBehaviour
         AuthUIManager.instance.LoginScreen();
     }
 
-    // Saves user credentials for "Remember Me" functionality.
-    // email: User's email
-    // password: User's password
+    // Remember Me functionality
     private void SaveCredentials(string email, string password)
     {
         PlayerPrefs.SetInt(RememberMeKey, 1);
@@ -205,7 +197,6 @@ public class FirebaseManager : MonoBehaviour
         PlayerPrefs.Save();
     }
 
-    // Clears saved credentials from PlayerPrefs.
     private void ClearSavedCredentials()
     {
         PlayerPrefs.SetInt(RememberMeKey, 0);
@@ -214,14 +205,13 @@ public class FirebaseManager : MonoBehaviour
         PlayerPrefs.Save();
     }
 
-    // Checks if "Remember Me" is currently enabled.
-    // Returns: True if Remember Me is enabled, otherwise false
+    // Public method to check the current Remember Me toggle state
     public bool IsRememberMeEnabled()
     {
         return rememberMeToggle != null && rememberMeToggle.isOn;
     }
 
-    // Resends the verification email to the current user.
+    // Public method to resend verification email
     public void ResendVerificationEmail()
     {
         if (user != null)
@@ -230,7 +220,7 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
-    // Starts the verification check process.
+    // Method to start checking for verification
     public void StartVerificationCheck()
     {
         // Stop any existing verification check
@@ -240,7 +230,7 @@ public class FirebaseManager : MonoBehaviour
         verificationCheckCoroutine = StartCoroutine(CheckEmailVerificationStatus());
     }
 
-    // Stops the verification check process.
+    // Method to stop checking for verification
     public void StopVerificationCheck()
     {
         if (verificationCheckCoroutine != null)
@@ -250,14 +240,14 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
-    // Periodically checks if the user's email has been verified.
+    // Coroutine to periodically check verification status
     private IEnumerator CheckEmailVerificationStatus()
     {
         while (true)
         {
             if (user != null)
             {
-                // Reload the user to get updated verification info
+                // Reload the user to get updated info
                 var reloadTask = user.ReloadAsync();
                 yield return new WaitUntil(() => reloadTask.IsCompleted);
 
@@ -279,7 +269,12 @@ public class FirebaseManager : MonoBehaviour
                         ClearSavedCredentials();
                     }
 
-                    // Load the game scene
+                    // Notify FirebaseProgressManager about user login
+                    if (FirebaseProgressManager.Instance != null)
+                    {
+                        FirebaseProgressManager.Instance.OnUserLoggedIn(user.UserId);
+                    }
+
                     FirebaseGameManager.instance.ChangeScene(1);
                     yield break;
                 }
@@ -295,9 +290,7 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
-    // Validates an email address format.
-    // email: Email to validate
-    // Returns: True if email is valid, otherwise false
+    // Validation methods
     private bool IsValidEmail(string email)
     {
         // Basic email validation
@@ -308,9 +301,6 @@ public class FirebaseManager : MonoBehaviour
         return email.Contains("@") && email.Contains(".");
     }
 
-    // Checks if a password meets strength requirements.
-    // password: Password to check
-    // Returns: True if password is strong enough, otherwise false
     private bool IsPasswordStrong(string password)
     {
         if (string.IsNullOrEmpty(password) || password.Length < 6)
@@ -321,15 +311,13 @@ public class FirebaseManager : MonoBehaviour
         return true;
     }
 
-    // Shows or hides the loading panel.
-    // isLoading: True to show loading panel, false to hide
+    // Utility methods
     private void ShowLoading(bool isLoading)
     {
         if (loadingPanel != null)
             loadingPanel.SetActive(isLoading);
     }
 
-    // Checks and fixes Firebase dependencies.
     private IEnumerator CheckAndFixDependancies()
     {
         var checkAndFixDependenciesTask = FirebaseApp.CheckAndFixDependenciesAsync();
@@ -347,18 +335,15 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
-    // Initializes Firebase Authentication and sets up event handlers.
     private void InitializeFirebase()
     {
         auth = FirebaseAuth.DefaultInstance;
         StartCoroutine(CheckAutoLogin());
 
-        // Set up auth state changed event
         auth.StateChanged += AuthStateChanged;
         AuthStateChanged(this, null);
     }
 
-    // Checks if auto-login is possible and attempts it if enabled.
     private IEnumerator CheckAutoLogin()
     {
         yield return new WaitForEndOfFrame();
@@ -397,7 +382,6 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
-    // Handles auto-login based on user verification status.
     private void AutoLogin()
     {
         if (user != null)
@@ -407,6 +391,12 @@ public class FirebaseManager : MonoBehaviour
             {
                 if (user.IsEmailVerified)
                 {
+                    // Notify FirebaseProgressManager about user login
+                    if (FirebaseProgressManager.Instance != null)
+                    {
+                        FirebaseProgressManager.Instance.OnUserLoggedIn(user.UserId);
+                    }
+                    
                     FirebaseGameManager.instance.ChangeScene(1);
                 }
                 else
@@ -427,9 +417,6 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
-    // Handles Firebase authentication state changes.
-    // sender: Event sender
-    // eventArgs: Event arguments
     private void AuthStateChanged(object sender, System.EventArgs eventArgs)
     {
         if (auth.CurrentUser != user)
@@ -450,20 +437,17 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
-    // Clears all output text fields.
     public void ClearOutputs()
     {
         loginOutputText.text = "";
         registerOutputText.text = "";
     }
 
-    // Initiates login process when login button is clicked.
     public void LoginButton()
     {
         StartCoroutine(loginLogic(loginEmail.text, loginPassword.text, rememberMeToggle.isOn));
     }
 
-    // Initiates registration process when register button is clicked.
     public void RegisterButton()
     {
         // Before registration, check the Remember Me toggle state
@@ -471,10 +455,7 @@ public class FirebaseManager : MonoBehaviour
         StartCoroutine(registerLogic(registerUsername.text, RegisterEmail.text, RegisterPassword.text, RegisterConfirmPassword.text));
     }
 
-    // Handles the login process.
-    // email: User email
-    // password: User password
-    // rememberMe: Whether to remember login credentials
+    // Updated login method with explicit Remember Me parameter
     private IEnumerator loginLogic(string email, string password, bool rememberMe)
     {
         // Show loading indicator
@@ -488,24 +469,20 @@ public class FirebaseManager : MonoBehaviour
             yield break;
         }
 
-        // Create credential from email and password
         Credential credential = EmailAuthProvider.GetCredential(email, password);
 
-        // Attempt to sign in
         var loginTask = auth.SignInWithCredentialAsync(credential);
 
         yield return new WaitUntil(predicate: () => loginTask.IsCompleted);
 
         ShowLoading(false);
 
-        // Handle login errors
         if (loginTask.Exception != null)
         {
             FirebaseException firebaseException = (FirebaseException)loginTask.Exception.GetBaseException();
             AuthError error = (AuthError)firebaseException.ErrorCode;
             string output = "Unknown Error, Please try again";
 
-            // Convert Firebase error codes to user-friendly messages
             switch (error)
             {
                 case AuthError.MissingEmail:
@@ -544,11 +521,13 @@ public class FirebaseManager : MonoBehaviour
                 ClearSavedCredentials();
             }
 
-            // Check if email is verified
             if (user.IsEmailVerified)
             {
-                yield return new WaitForSeconds(1f);
-                FirebaseGameManager.instance.ChangeScene(1);
+                // Load user progress data before changing scene with callback
+                yield return StartCoroutine(LoadUserProgressData(user.UserId, () => {
+                    // Now we can safely change scenes
+                    FirebaseGameManager.instance.ChangeScene(1);
+                }));
             }
             else
             {
@@ -557,16 +536,10 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
-    // Handles the registration process.
-    // _username: User's chosen username
-    // _email: User's email
-    // _password: User's password
-    // _confirmPassword: Confirmation of password
     private IEnumerator registerLogic(string _username, string _email, string _password, string _confirmPassword)
     {
         ShowLoading(true);
 
-        // Validate registration inputs
         if (string.IsNullOrEmpty(_username) || _username.Length < 3)
         {
             registerOutputText.text = "Username must be at least 3 characters";
@@ -597,18 +570,15 @@ public class FirebaseManager : MonoBehaviour
             lastRegisteredEmail = _email;
             lastRegisteredPassword = _password;
 
-            // Create new user in Firebase
             var registerTask = auth.CreateUserWithEmailAndPasswordAsync(_email, _password);
             yield return new WaitUntil(predicate: () => registerTask.IsCompleted);
 
-            // Handle registration errors
             if (registerTask.Exception != null)
             {
                 FirebaseException firebaseException = (FirebaseException)registerTask.Exception.GetBaseException();
                 AuthError error = (AuthError)firebaseException.ErrorCode;
                 string output = "Unknown Error, Please try again";
 
-                // Convert Firebase error codes to user-friendly messages
                 switch (error)
                 {
                     case AuthError.InvalidEmail:
@@ -632,18 +602,15 @@ public class FirebaseManager : MonoBehaviour
             }
             else
             {
-                // Setup user profile with username
-                Firebase.Auth.UserProfile profile = new Firebase.Auth.UserProfile
+                UserProfile profile = new UserProfile
                 {
                     DisplayName = _username,
                     //TODO: give profile default photo
                 };
 
-                // Update user profile with username
                 var DefaultUserTask = user.UpdateUserProfileAsync(profile);
                 yield return new WaitUntil(predicate: () => DefaultUserTask.IsCompleted);
 
-                // Handle profile update errors
                 if (DefaultUserTask.Exception != null)
                 {
                     user.DeleteAsync();
@@ -651,7 +618,6 @@ public class FirebaseManager : MonoBehaviour
                     AuthError error = (AuthError)firebaseException.ErrorCode;
                     string output = "Unknown Error, Please try again";
 
-                    // Convert Firebase error codes to user-friendly messages
                     switch (error)
                     {
                         case AuthError.Cancelled:
@@ -673,16 +639,13 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
-    // Sends a verification email to the current user.
     private IEnumerator sendVerificationEmail()
     {
         if (user != null)
         {
-            // Send verification email
             var emailTask = user.SendEmailVerificationAsync();
             yield return new WaitUntil(predicate: () => emailTask.IsCompleted);
 
-            // Handle verification email errors
             if (emailTask.Exception != null)
             {
                 FirebaseException firebaseException = (FirebaseException)emailTask.Exception.GetBaseException();
@@ -690,7 +653,6 @@ public class FirebaseManager : MonoBehaviour
 
                 string output = "Unknown Error, Try Again!";
 
-                // Convert Firebase error codes to user-friendly messages
                 switch (error)
                 {
                     case AuthError.Cancelled:
@@ -713,6 +675,115 @@ public class FirebaseManager : MonoBehaviour
                 StartVerificationCheck();
                 Debug.Log("Email Sent Successfully");
             }
+        }
+    }
+
+    private IEnumerator LoadUserProgressData(string userId, System.Action onComplete = null)
+    {
+        DatabaseReference reference = FirebaseDatabase.DefaultInstance.RootReference;
+        int totalFiles = progressFileNames.Length;
+        int completedFiles = 0;
+
+        foreach (string progressFile in progressFileNames)
+        {
+            string localFilePath = Path.Combine(Application.persistentDataPath, progressFile + ".json");
+            bool hasLocalFile = File.Exists(localFilePath);
+            string localJson = null;
+
+            // Read local file if it exists
+            if (hasLocalFile)
+            {
+                try
+                {
+                    localJson = File.ReadAllText(localFilePath);
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogError($"Error reading local file {progressFile}: {ex.Message}");
+                }
+            }
+
+            // Get Firebase data
+            var dataTask = reference.Child("users").Child(userId).Child("progress").Child(progressFile).GetValueAsync();
+            yield return new WaitUntil(() => dataTask.IsCompleted);
+
+            if (dataTask.Exception != null)
+            {
+                Debug.LogWarning($"Failed to load {progressFile}: {dataTask.Exception.Message}");
+                
+                // If we have local data but couldn't fetch Firebase data, upload local data
+                if (hasLocalFile && !string.IsNullOrEmpty(localJson))
+                {
+                    var uploadTask = reference.Child("users").Child(userId).Child("progress")
+                        .Child(progressFile).SetRawJsonValueAsync(localJson);
+                    yield return new WaitUntil(() => uploadTask.IsCompleted);
+
+                    if (uploadTask.Exception != null)
+                    {
+                        Debug.LogError($"Failed to upload local {progressFile}: {uploadTask.Exception.Message}");
+                    }
+                    else
+                    {
+                        Debug.Log($"Successfully uploaded local {progressFile} to Firebase");
+                    }
+                }
+                
+                completedFiles++;
+                continue;
+            }
+
+            DataSnapshot snapshot = dataTask.Result;
+            
+            if (snapshot.Exists)
+            {
+                string firebaseJson = snapshot.GetRawJsonValue();
+                
+                // Compare timestamps or version numbers if included in the JSON
+                // For this example, we'll use a simple string comparison
+                if (hasLocalFile && localJson != firebaseJson)
+                {
+                    // TODO: Implement proper conflict resolution strategy
+                    // For now, we'll keep the Firebase version
+                    try
+                    {
+                        File.WriteAllText(localFilePath, firebaseJson);
+                        Debug.Log($"Updated local {progressFile} with Firebase data");
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Debug.LogError($"Error saving {progressFile} data: {ex.Message}");
+                    }
+                }
+            }
+            else if (hasLocalFile && !string.IsNullOrEmpty(localJson))
+            {
+                // No data in Firebase but we have local data, so upload it
+                var uploadTask = reference.Child("users").Child(userId).Child("progress")
+                    .Child(progressFile).SetRawJsonValueAsync(localJson);
+                yield return new WaitUntil(() => uploadTask.IsCompleted);
+
+                if (uploadTask.Exception != null)
+                {
+                    Debug.LogError($"Failed to upload local {progressFile}: {uploadTask.Exception.Message}");
+                }
+                else
+                {
+                    Debug.Log($"Successfully uploaded local {progressFile} to Firebase");
+                }
+            }
+            else
+            {
+                Debug.Log($"No data found for {progressFile}");
+            }
+
+            completedFiles++;
+        }
+
+        Debug.Log($"All progress data processed ({completedFiles}/{totalFiles} files)");
+
+        if (onComplete != null)
+        {
+            onComplete();
         }
     }
 }
