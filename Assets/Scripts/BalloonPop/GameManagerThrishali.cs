@@ -234,7 +234,7 @@ public class GameManagerThrishali : MonoBehaviour
     }
     private void SaveSessionData(float overallAccuracy)
     {
-        string filePath = Application.persistentDataPath + "/Task5UserProgress.json"; // Updated file name
+        string filePath = Application.persistentDataPath + "/sessions.json";
 
         // Load existing session data if file exists
         SessionDataList sessionDataList = new SessionDataList();
@@ -329,7 +329,7 @@ public class GameManagerThrishali : MonoBehaviour
     }
     private void ShowRecentSessions()
     {
-        string filePath = Application.persistentDataPath + "/Task5UserProgress.json"; // Updated file name
+        string filePath = Application.persistentDataPath + "/sessions.json";
 
         if (!File.Exists(filePath))
         {
@@ -360,8 +360,9 @@ public class GameManagerThrishali : MonoBehaviour
 
         // Display the last 5 sessions (or less if there aren't 5)
         int count = Mathf.Min(5, sessionDataList.sessions.Count);
+        //List<SessionData> latestSessions = sessionDataList.sessions.GetRange(sessionDataList.sessions.Count - count, count);
         List<SessionData> latestSessions = sessionDataList.sessions.GetRange(sessionDataList.sessions.Count - count, count)
-            .OrderByDescending(s => s.sessionID).ToList();
+        .OrderByDescending(s => s.sessionID).ToList();
 
         foreach (SessionData session in latestSessions)
         {

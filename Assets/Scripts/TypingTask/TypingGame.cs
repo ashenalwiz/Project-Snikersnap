@@ -42,7 +42,7 @@ public class TypingGame : MonoBehaviour
     private int attempts = 0;
 
     [SerializeField] private string customSavePath = "Assets/GameData/";
-    [SerializeField] private string saveFileName = "Task8UserProgress.json";
+    [SerializeField] private string saveFileName = "UserProgress.json";
 
     //----------------New Updates--------------------------
     private SessionData2 SessionData2 = new SessionData2();
@@ -70,7 +70,7 @@ public class TypingGame : MonoBehaviour
             SessionData2.wordAttempts = new List<WordAttempt>();
         }
 
-        jsonFilePath = System.IO.Path.Combine(Application.persistentDataPath, saveFileName);
+        jsonFilePath = System.IO.Path.Combine(Application.dataPath, "GameData", saveFileName);
 
         LoadPreviousData();
 
@@ -348,11 +348,6 @@ public class TypingGame : MonoBehaviour
 
     void SaveProgressToFile()
     {
-        // Ensure the directory exists
-        string directory = Application.persistentDataPath;
-        string fullPath = System.IO.Path.Combine(directory, saveFileName);
-        Debug.Log($"Target save path: {fullPath}");
-
         // Check if SessionData2 is properly initialized
         if (SessionData2 == null)
         {
@@ -373,6 +368,17 @@ public class TypingGame : MonoBehaviour
         {
             Debug.Log($"Current session word: {attempt.word}, Attempts: {attempt.attempts}, Correct: {attempt.correct}, Skipped: {attempt.skipped}");
         }
+
+        // Make sure the directory exists
+        string directory = System.IO.Path.Combine(Application.dataPath, "GameData");
+        if (!Directory.Exists(directory))
+        {
+            Directory.CreateDirectory(directory);
+            Debug.Log($"Created directory: {directory}");
+        }
+
+        string fullPath =System.IO.Path.Combine(directory, saveFileName);
+        Debug.Log($"Target save path: {fullPath}");
 
         // Handle existing data
         SessionData2 existingData = new SessionData2();
@@ -502,7 +508,7 @@ public class TypingGame : MonoBehaviour
 
     void LoadPreviousData()
     {
-        string directory = Application.persistentDataPath;
+        string directory = System.IO.Path.Combine(Application.dataPath, "GameData");
         string fullPath = System.IO.Path.Combine(directory, saveFileName);
         if (File.Exists(fullPath))
         {

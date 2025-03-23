@@ -7,34 +7,31 @@ using TMPro;
 
 public class ProgressTableManager : MonoBehaviour
 {
-    // Define the filename for storing progress data
-    private const string PROGRESS_FILENAME = "Task3UserProgress.json";
+    // File settings 
+    private const string PROGRESS_FILENAME = "SithumiProgress.json";
     private string saveFilePath;
 
-    // UI References: Assign in Unity Inspector
-    [SerializeField] private Transform contentParent;   // Parent for dynamically created UI elements
-    [SerializeField] private GameObject rowPrefab;      // Prefab for individual data rows
-    [SerializeField] private GameObject headerPrefab;   // Prefab for table headers
-    [SerializeField] private GameObject sessionHeaderPrefab;  // Prefab for session headers
+    // UI References
+    [SerializeField] private Transform contentParent;
+    [SerializeField] private GameObject rowPrefab;
+    [SerializeField] private GameObject headerPrefab;
+    [SerializeField] private GameObject sessionHeaderPrefab;
 
-    // Progress data object (stores all session and round details)
+    // Use the shared data classes
     private SithumiProgress.ProgressData progressData;
 
     private void Awake()
     {
-        // Define the path where progress data will be saved
         saveFilePath = System.IO.Path.Combine(Application.persistentDataPath, PROGRESS_FILENAME);
         Debug.Log("JSON file path: " + saveFilePath);
     }
 
     private void Start()
     {
-        // Load and display the progress data on startup
         LoadProgressData();
         DisplayProgressData();
     }
 
-    /// Loads progress data from a JSON file.
     public void LoadProgressData()
     {
         if (File.Exists(saveFilePath))
@@ -42,76 +39,34 @@ public class ProgressTableManager : MonoBehaviour
             try
             {
                 string jsonData = File.ReadAllText(saveFilePath);
-                Debug.Log("Raw JSON: " + jsonData);
-
-                // Attempt to deserialize the JSON data into the ProgressData class
                 progressData = JsonUtility.FromJson<SithumiProgress.ProgressData>(jsonData);
                 Debug.Log($"Data loaded successfully with {progressData.sessions.Count} sessions");
-
-                // Validate session data if necessary
-                if (progressData.sessions.Count > 0)
-                {
-                    bool needsValidation = true;
-                    foreach (var session in progressData.sessions)
-                    {
-                        if (!string.IsNullOrEmpty(session.Date))
-                        {
-                            needsValidation = false;
-                            break;
-                        }
-                    }
-
-                    if (needsValidation)
-                    {
-                        Debug.LogWarning("Date field appears empty, attempting to handle possible format issues...");
-                        ValidateAndRepairSessionData();
-                    }
-                }
             }
             catch (Exception e)
             {
                 Debug.LogError("Error loading data: " + e.Message);
-                // Initialize an empty progress data object to avoid null references
                 progressData = new SithumiProgress.ProgressData { sessions = new List<SithumiProgress.Session>() };
             }
         }
         else
         {
             Debug.LogWarning("No progress file found at: " + saveFilePath);
-            // If no file exists, create an empty data structure
             progressData = new SithumiProgress.ProgressData { sessions = new List<SithumiProgress.Session>() };
         }
     }
 
-    /// Validates and repairs missing session data fields.
-    private void ValidateAndRepairSessionData()
-    {
-        for (int i = 0; i < progressData.sessions.Count; i++)
-        {
-            var session = progressData.sessions[i];
-
-            // If the Date field is missing but rounds exist, generate a placeholder date
-            if (string.IsNullOrEmpty(session.Date) && session.rounds.Count > 0)
-            {
-                session.Date = "Session " + (i + 1);
-                Debug.LogWarning($"Repaired missing date for session {i + 1}");
-            }
-        }
-    }
-
-    /// Displays progress data in the UI.
     public void DisplayProgressData()
     {
-        // Clear existing UI elements before adding new ones
+        // Clear existing content
         foreach (Transform child in contentParent)
         {
             Destroy(child.gameObject);
         }
 
-        // Create a single column header row
+        // Create ONLY ONE column header
         GameObject header = Instantiate(headerPrefab, contentParent);
+        // Don't call SetHeaderText here - the header prefab should already have text set correctly
 
-        // If no data exists, show a placeholder message
         if (progressData.sessions == null || progressData.sessions.Count == 0)
         {
             GameObject emptyRow = Instantiate(rowPrefab, contentParent);
@@ -119,7 +74,7 @@ public class ProgressTableManager : MonoBehaviour
             if (texts.Length > 0)
             {
                 texts[0].text = "No data available";
-                // Center the text
+                // Center the text across all columns
                 RectTransform rectTransform = texts[0].GetComponent<RectTransform>();
                 if (rectTransform != null)
                 {
@@ -129,29 +84,30 @@ public class ProgressTableManager : MonoBehaviour
             return;
         }
 
-        // Iterate through each session and display its data
+        // Display data for each session
         foreach (SithumiProgress.Session session in progressData.sessions)
         {
-            // Create a session header row
+            // Create session header
             GameObject sessionHeader = Instantiate(
                 sessionHeaderPrefab != null ? sessionHeaderPrefab : rowPrefab, contentParent);
 
             TMP_Text[] sessionTexts = sessionHeader.GetComponentsInChildren<TMP_Text>();
             if (sessionTexts.Length > 0)
             {
-                sessionTexts[0].text = "Session: " + session.Date;
+                // Use the first text component for the session date
+                sessionTexts[0].text = "Session: " + session.date;
                 sessionTexts[0].fontStyle = FontStyles.Bold;
                 sessionTexts[0].fontSize += 2;
                 sessionTexts[0].color = Color.blue;
 
-                // Clear any additional text fields in the session header
+                // Clear other text fields in the session header
                 for (int i = 1; i < sessionTexts.Length; i++)
                 {
                     sessionTexts[i].text = "";
                 }
             }
 
-            // Display round data in order
+            // Create rows for each round IN THE ORIGINAL ORDER from the JSON
             foreach (SithumiProgress.Round round in session.rounds)
             {
                 GameObject row = Instantiate(rowPrefab, contentParent);
@@ -165,22 +121,33 @@ public class ProgressTableManager : MonoBehaviour
                     texts[3].text = round.attempts.ToString();
                     texts[4].text = round.skipped ? "Yes" : "No";
 
-                    // Apply color coding for readability
-                    texts[4].color = round.skipped ? Color.red : Color.green;
+                    // Apply color coding for better readability
+                    if (round.skipped)
+                    {
+                        texts[4].color = Color.red;
+                    }
+                    else
+                    {
+                        texts[4].color = Color.green;
+                    }
 
-                    // Color-code accuracy percentage
+                    // Color-code accuracy
                     if (round.accuracy >= 80)
                         texts[2].color = new Color(0, 0.7f, 0);  // Green
                     else if (round.accuracy >= 50)
                         texts[2].color = new Color(0.9f, 0.6f, 0);  // Orange
-                    else
+                    else if (round.accuracy > 0)
                         texts[2].color = new Color(0.8f, 0, 0);  // Red
+                    else
+                        texts[2].color = Color.red;  // For 0.0%
+
                 }
+
             }
         }
     }
 
-    /// Creates sample progress data for testing.
+    // Helper function to create sample data (for testing)
     public void CreateSampleData()
     {
         SithumiProgress.ProgressData sample = new SithumiProgress.ProgressData
@@ -189,7 +156,7 @@ public class ProgressTableManager : MonoBehaviour
             {
                 new SithumiProgress.Session
                 {
-                    Date = DateTime.Now.ToString("dd-MM-yyyy"),
+                    date = DateTime.Now.ToString("dd-MM-yyyy"),
                     rounds = new List<SithumiProgress.Round>
                     {
                         new SithumiProgress.Round { round = 1, targetLetter = "A-a", accuracy = 85.5f, attempts = 10, skipped = false },
@@ -210,7 +177,7 @@ public class ProgressTableManager : MonoBehaviour
         DisplayProgressData();
     }
 
-    /// Clears all progress data.
+    // Add a method to clear all data (for testing purposes)
     public void ClearAllData()
     {
         if (File.Exists(saveFilePath))
@@ -222,4 +189,5 @@ public class ProgressTableManager : MonoBehaviour
         progressData = new SithumiProgress.ProgressData { sessions = new List<SithumiProgress.Session>() };
         DisplayProgressData();
     }
+
 }
