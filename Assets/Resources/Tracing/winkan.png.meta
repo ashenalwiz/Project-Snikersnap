@@ -173,7 +173,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      winkan_0: -5219680051114696129
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

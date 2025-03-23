@@ -4,27 +4,31 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
+// Class to store data for each round of gameplay
 [Serializable]
 public class RoundData
 {
-    public int round;
-    public string targetLetter;
-    public float accuracy;
-    public int attempts;
-    public bool skipped;
+    public int round;               // Current round number
+    public string targetLetter;     // The letter that was the target for this round
+    public float accuracy;          // Player's accuracy percentage for the round
+    public int attempts;            // Total number of catch attempts made
+    public bool skipped;            // Whether the player skipped this round
 }
 
+// Class to store data for a single play session
 [Serializable]
 public class SessionData1
 {
-    public string Date;
-    public List<RoundData> rounds = new List<RoundData>();
+    public string Date;             // Date when the session was played
+    public string SessionId;        // Unique identifier for the session
+    public List<RoundData> rounds = new List<RoundData>();  // Collection of rounds played in this session
 }
 
+// Class to store all player progress data across multiple sessions
 [Serializable]
 public class SithumiProgressData
 {
-    public List<SessionData1> sessions = new List<SessionData1>();
+    public List<SessionData1> sessions = new List<SessionData1>();  // Collection of all play sessions
 }
 
 public class GameStatsRecorder : MonoBehaviour
@@ -39,15 +43,15 @@ public class GameStatsRecorder : MonoBehaviour
     // Stats tracking variables
     private SessionData1 currentSession = new SessionData1();
     private int currentRound = 1;
-    private int correctCatches = 0;
-    private int totalCatches = 0;
-    private bool isRoundSkipped = false;
+    private int correctCatches = 0;           // Number of correct letters caught in current round
+    private int totalCatches = 0;             // Total number of catches (correct and incorrect) in current round
+    private bool isRoundSkipped = false;      // Flag to track if player skipped the current round
 
     // Store the current round's target letter
     private string currentTargetLetter = "";
 
-    // Add a flag to track if we're in test mode
-    public bool saveAfterEachRound = true; // Now true by default
+    // Flag to control saving frequency
+    public bool saveAfterEachRound = true;    // Now true by default
 
     // File name for all progress
     private const string PROGRESS_FILENAME = "SithumiProgress.json";
@@ -61,7 +65,7 @@ public class GameStatsRecorder : MonoBehaviour
     // Track if final round stats have been saved
     private bool finalRoundSaved = false;
 
-    // Add a flag to track if we're in the restart process
+    // Flag to track if we're in the restart process
     private bool isRestarting = false;
 
     void Start()
@@ -84,8 +88,10 @@ public class GameStatsRecorder : MonoBehaviour
 
         // Initialize session data with current date
         currentSession.Date = DateTime.Now.ToString("dd-MM-yyyy");
+
         // Create a unique session ID based on time
         sessionId = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        currentSession.SessionId = sessionId; // Store the SessionId in the session data
         Debug.Log($"GameStatsRecorder: Initialized with date {currentSession.Date}, session ID {sessionId}");
 
         // Set the save file path using string concatenation
@@ -228,6 +234,7 @@ public class GameStatsRecorder : MonoBehaviour
         currentSession = new SessionData1();
         currentSession.Date = DateTime.Now.ToString("dd-MM-yyyy");
         sessionId = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        currentSession.SessionId = sessionId; // Store the SessionId in the new session data
 
         // Reset tracking variables
         correctCatches = 0;
@@ -333,6 +340,7 @@ public class GameStatsRecorder : MonoBehaviour
 
     private void CaptureCurrentTargetLetter()
     {
+        // Get the current target letter from the letterSpawner
         if (letterSpawner != null && letterSpawner.mainLetterText != null && letterSpawner.mainLetterText.text.Length > 0)
         {
             char mainLetter = letterSpawner.mainLetterText.text[0];
@@ -347,6 +355,7 @@ public class GameStatsRecorder : MonoBehaviour
 
     private void OnSkipButtonPressed()
     {
+        // Mark the current round as skipped
         isRoundSkipped = true;
         Debug.Log($"GameStatsRecorder: Skip button pressed for round {GetCurrentRoundFromUI()}");
     }
@@ -392,6 +401,7 @@ public class GameStatsRecorder : MonoBehaviour
 
     private int GetCurrentRoundFromUI()
     {
+        // Extract the current round number from the UI text
         if (progressManager != null && progressManager.roundCounterText != null)
         {
             string roundText = progressManager.roundCounterText.text;
@@ -410,14 +420,14 @@ public class GameStatsRecorder : MonoBehaviour
 
     private void SaveRoundStats(int roundNumber)
     {
-        // Create round data
+        // Create round data object to store statistics for the completed round
         RoundData roundData = new RoundData();
         roundData.round = roundNumber;
 
         // Use the stored target letter that was captured at the beginning of the round
         roundData.targetLetter = currentTargetLetter;
 
-        // Calculate accuracy
+        // Calculate accuracy as percentage of correct catches
         roundData.accuracy = totalCatches > 0 ? ((float)correctCatches / totalCatches) * 100f : 0f;
         roundData.attempts = totalCatches;
         roundData.skipped = isRoundSkipped;
@@ -436,12 +446,8 @@ public class GameStatsRecorder : MonoBehaviour
             // Create or load the SithumiProgressData
             SithumiProgressData progressData = LoadExistingProgressData();
 
-            // Remove any partial data from the same session
-            RemovePartialSessions(progressData);
-
-            // Only add the session to the file if the session is complete 
-            // or we want to save intermediate results
-            progressData.sessions.Add(currentSession);
+            // Find and update the current session if it exists, otherwise add it as new
+            UpdateOrAddCurrentSession(progressData);
 
             // Convert progress data to JSON
             string json = JsonUtility.ToJson(progressData, true);
@@ -460,39 +466,36 @@ public class GameStatsRecorder : MonoBehaviour
         }
     }
 
-    private void RemovePartialSessions(SithumiProgressData progressData)
+    private void UpdateOrAddCurrentSession(SithumiProgressData progressData)
     {
-        // First, look for any session from today with fewer or equal rounds
-        // (these would be partial sessions from the current gameplay)
-        List<int> indicesToRemove = new List<int>();
-
+        // Find if this specific session (by SessionId) already exists in the data
+        int existingSessionIndex = -1;
         for (int i = 0; i < progressData.sessions.Count; i++)
         {
-            SessionData1 session = progressData.sessions[i];
-
-            // If this session is from today, consider it a partial session
-            if (session.Date == currentSession.Date)
+            if (progressData.sessions[i].SessionId == currentSession.SessionId)
             {
-                // If the current session has more rounds, or the same number of rounds 
-                // (meaning we're updating the same session), mark it for removal
-                if (session.rounds.Count <= currentSession.rounds.Count)
-                {
-                    indicesToRemove.Add(i);
-                }
+                existingSessionIndex = i;
+                break;
             }
         }
 
-        // Remove the partial sessions (in reverse order to avoid index issues)
-        for (int i = indicesToRemove.Count - 1; i >= 0; i--)
+        // If session exists, update it with current data
+        if (existingSessionIndex >= 0)
         {
-            int indexToRemove = indicesToRemove[i];
-            progressData.sessions.RemoveAt(indexToRemove);
-            Debug.Log($"Removed partial session at index {indexToRemove}");
+            progressData.sessions[existingSessionIndex] = currentSession;
+            Debug.Log($"Updated existing session with ID {currentSession.SessionId}");
+        }
+        // Otherwise add as a new session
+        else
+        {
+            progressData.sessions.Add(currentSession);
+            Debug.Log($"Added new session with ID {currentSession.SessionId}");
         }
     }
 
     private SithumiProgressData LoadExistingProgressData()
     {
+        // Initialize empty progress data
         SithumiProgressData progressData = new SithumiProgressData();
 
         try
@@ -508,6 +511,17 @@ public class GameStatsRecorder : MonoBehaviour
                 {
                     progressData = JsonUtility.FromJson<SithumiProgressData>(json);
                     Debug.Log($"Loaded existing progress data with {progressData.sessions.Count} sessions");
+
+                    // Handle existing data that doesn't have SessionId
+                    for (int i = 0; i < progressData.sessions.Count; i++)
+                    {
+                        if (string.IsNullOrEmpty(progressData.sessions[i].SessionId))
+                        {
+                            // Generate a unique ID for old sessions
+                            progressData.sessions[i].SessionId = $"legacy_{progressData.sessions[i].Date}_{i}";
+                            Debug.Log($"Added missing SessionId to legacy session: {progressData.sessions[i].SessionId}");
+                        }
+                    }
                 }
             }
             else
@@ -542,21 +556,23 @@ public class GameStatsRecorder : MonoBehaviour
             style.fontSize = 14;
             style.normal.textColor = Color.white;
 
+            // Display debug information on screen
             GUI.Label(new Rect(10, 10, 800, 30), $"PersistentDataPath: {Application.persistentDataPath}", style);
             GUI.Label(new Rect(10, 40, 800, 30), $"Save File Path: {saveFilePath}", style);
             GUI.Label(new Rect(10, 70, 800, 30), $"Current Target Letter: {currentTargetLetter}", style);
             GUI.Label(new Rect(10, 100, 800, 30), $"Round: {GetCurrentRoundFromUI()}, Skipped: {isRoundSkipped}", style);
             GUI.Label(new Rect(10, 130, 800, 30), $"Final Round Saved: {finalRoundSaved}", style);
             GUI.Label(new Rect(10, 160, 800, 30), $"Is Restarting: {isRestarting}", style);
+            GUI.Label(new Rect(10, 190, 800, 30), $"Session ID: {sessionId}", style);
 
             // Add a button to manually save
-            if (GUI.Button(new Rect(10, 190, 120, 40), "Save Stats Now"))
+            if (GUI.Button(new Rect(10, 220, 120, 40), "Save Stats Now"))
             {
                 SaveStatsNow();
             }
 
             // Add a button to open the file location
-            if (GUI.Button(new Rect(10, 240, 120, 40), "Open File Location"))
+            if (GUI.Button(new Rect(10, 270, 120, 40), "Open File Location"))
             {
                 OpenPersistentDataFolder();
             }
