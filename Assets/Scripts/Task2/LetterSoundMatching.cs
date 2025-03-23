@@ -404,7 +404,7 @@ public class LetterSoundMatching : MonoBehaviour
     {
         try
         {
-            string filePath = System.IO.Path.Combine(Application.persistentDataPath, "Task2UserProgress.json");
+            string filePath = System.IO.Path.Combine(Application.dataPath, "GameData/UserProgressLetterSoundMatching.json");
             if (File.Exists(filePath))
             {
                 string json = File.ReadAllText(filePath);
@@ -434,7 +434,7 @@ public class LetterSoundMatching : MonoBehaviour
     {
         try
         {
-            string filePath = System.IO.Path.Combine(Application.persistentDataPath, "Task2UserProgress.json");
+            string filePath = System.IO.Path.Combine(Application.dataPath, "GameData/UserProgressLetterSoundMatching.json");
             PlayerProgressData data = new PlayerProgressData();
             data.letters = new PlayerLetterProgress[letterProgress.Count];
             
@@ -459,7 +459,8 @@ void SaveSessionSummary()
 {
     try
     {
-        string filePath = System.IO.Path.Combine(Application.persistentDataPath, "Task2SessionHistory.json");
+        // Update file path to use GameData directory
+        string filePath = System.IO.Path.Combine(Application.dataPath, "GameData/SessionHistory.json");
         SessionData newSession = new SessionData
         {
             date = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
@@ -480,11 +481,13 @@ void SaveSessionSummary()
             history = new SessionHistory();
         }
 
+        // Add new session to history
         if (history.sessions == null)
             history.sessions = new List<SessionData>();
 
         history.sessions.Add(newSession);
 
+        // Save updated history
         string updatedJson = JsonUtility.ToJson(history, true);
         File.WriteAllText(filePath, updatedJson);
         LogToFile("Session history saved successfully");
