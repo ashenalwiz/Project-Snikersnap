@@ -173,7 +173,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      chatgaroo_0: 1159422614891285423
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
