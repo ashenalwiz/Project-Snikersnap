@@ -54,7 +54,7 @@ public class GameStatsRecorder : MonoBehaviour
     public bool saveAfterEachRound = true;    // Now true by default
 
     // File name for all progress
-    private const string PROGRESS_FILENAME = "SithumiProgress.json";
+    private const string PROGRESS_FILENAME = "Task3UserProgress.json";
 
     // Store the save file path
     private string saveFilePath = "";

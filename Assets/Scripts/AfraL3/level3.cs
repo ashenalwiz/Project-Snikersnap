@@ -144,7 +144,8 @@ public class WordGameManager : MonoBehaviour
         gameOverImage.SetActive(true);
         gameData.rounds.Add(currentRound);
         SaveProgress();
-        Debug.Log("Game Over! Progress saved.");
+        FirebaseProgressManager.Instance.UploadProgressToFirebase();  // Add this line
+        Debug.Log("Game Over! Progress saved and uploaded to Firebase.");
     }
 
     void SaveProgress()
