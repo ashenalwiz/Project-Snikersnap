@@ -251,7 +251,7 @@ public class LetterSoundMatchUp : MonoBehaviour
         scoreText.gameObject.SetActive(false);
         totalScore++; // Increment score after the round is completed
 
-        int lastRound = 2; //10
+        int lastRound = 10; //10
 
         if (currentRound >= lastRound) // End the game at the final round
 
