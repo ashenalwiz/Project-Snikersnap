@@ -81,6 +81,12 @@ public class InGameMenuManager : MonoBehaviour
 
     public void UpdateMusicVolume()
     {
+        Debug.Log("Music Slider Value Changed: " + musicVolumeSlider.value);
+        if (musicSource == null)
+        {
+            Debug.LogError("Music Source is NULL!");
+            return;
+        }
         musicSource.volume = musicVolumeSlider.value;
         PlayerPrefs.SetFloat("MusicVolume", musicVolumeSlider.value);
     }
@@ -95,5 +101,15 @@ public class InGameMenuManager : MonoBehaviour
     {
         musicSource.volume = musicVolumeSlider.value;
         taskSource.volume = taskVolumeSlider.value;
+    }
+
+    public void TestSetHalfVolume()
+    {
+        if (musicSource != null)
+        {
+            musicSource.volume = 0.5f;
+            musicVolumeSlider.value = 0.5f;
+            Debug.Log("TEST: Set volume to 0.5");
+        }
     }
 }
