@@ -51,6 +51,14 @@ public class WordGameManager : MonoBehaviour
     public TextMeshProUGUI scoreText;
     public GameObject gameOverImage;
 
+    public GameObject gameOverPanel;
+    public GameObject oneStarImage;
+    public GameObject twoStarImage;
+    public GameObject threeStarImage;
+    public Button restartButton;
+    public Button nextGameButton;
+    public Button exitToMenuButton;
+
     private RoundData currentRound;
     private string savePath;
 
@@ -64,6 +72,12 @@ public class WordGameManager : MonoBehaviour
         replayButton.onClick.AddListener(PlayAudio);
         option1Button.onClick.AddListener(() => CheckAnswer(option1Text.text));
         option2Button.onClick.AddListener(() => CheckAnswer(option2Text.text));
+
+        gameOverPanel.SetActive(false); // Hide the game over panel at the start
+
+        restartButton.onClick.AddListener(RestartGame);
+        nextGameButton.onClick.AddListener(PlayNextGame);
+        exitToMenuButton.onClick.AddListener(ExitToMenu);
 
         StartNewRound();
         LoadQuestion();
@@ -141,11 +155,55 @@ public class WordGameManager : MonoBehaviour
 
     void GameOver()
     {
-        gameOverImage.SetActive(true);
+        ShowGameOverPanel(); // Call the new method to display the game over panel
         gameData.rounds.Add(currentRound);
         SaveProgress();
-        FirebaseProgressManager.Instance.UploadProgressToFirebase();  // Add this line
-        Debug.Log("Game Over! Progress saved and uploaded to Firebase.");
+        Debug.Log("Game Over! Progress saved.");
+    }
+
+    void ShowGameOverPanel()
+    {
+        gameOverPanel.SetActive(true);
+
+        float accuracy = (float)currentRound.correctAnswers / currentRound.questionsAttempted * 100;
+
+        oneStarImage.SetActive(false);
+        twoStarImage.SetActive(false);
+        threeStarImage.SetActive(false);
+
+        if (accuracy < 40)
+        {
+            oneStarImage.SetActive(true);
+            Debug.Log("Player earned 1 star.");
+        }
+        else if (accuracy >= 40 && accuracy <= 85)
+        {
+            twoStarImage.SetActive(true);
+            Debug.Log("Player earned 2 stars.");
+        }
+        else
+        {
+            threeStarImage.SetActive(true);
+            Debug.Log("Player earned 3 stars.");
+        }
+    }
+
+    void RestartGame()
+    {
+        Debug.Log("Restart button clicked. Restarting the game.");
+        UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+    }
+
+    void PlayNextGame()
+    {
+        Debug.Log("Next Game button clicked. Loading the next game.");
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Task8"); // Replace "NextGameScene" with the actual scene name
+    }
+
+    void ExitToMenu()
+    {
+        Debug.Log("Exit to Menu button clicked. Returning to the main menu.");
+        UnityEngine.SceneManagement.SceneManager.LoadScene("TaskHolder"); // Replace "MainMenu" with the actual menu scene name
     }
 
     void SaveProgress()
