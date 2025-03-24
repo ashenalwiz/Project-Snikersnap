@@ -1,31 +1,26 @@
 name: Unity Build
 
-on:
-  push:
-    branches:
-      - main
+on: push
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
       - name: Setup Unity
-        uses: game-ci/unity-setup@v2
+        uses: game-ci/unity-setup@v3
         with:
-          unityVersion: 2022.3.4f1  # Change this to your Unity version
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          unityVersion: 6000.0.34f1  # Change this to your installed Unity version
 
-      - name: Build for WebGL
-        uses: game-ci/unity-builder@v2
-        with:
-          unityVersion: 2022.3.4f1  # Change this to your Unity version
-          targetPlatform: WebGL
+      - name: Build Unity Project
+        run: |
+          mkdir -p Build
+          unity-editor -quit -batchmode -nographics -logfile -buildTarget StandaloneWindows64 -projectPath . -executeMethod BuildScript.Build
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: WebGL-Build
-          path: build/WebGL
+          name: UnityBuild
+          path: Build/
