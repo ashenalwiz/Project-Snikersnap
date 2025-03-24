@@ -28,11 +28,12 @@ jobs:
       - name: Unity Build
         uses: game-ci/unity-builder@v2
         with:
-          unityVersion: 6000.0.32f1  # Change to your Unity version
+          unityVersion: 6000.0.32f1 # Change to your Unity version
           targetPlatform: StandaloneWindows64
 
       - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4  # Changed to v4
         with:
           name: Build
           path: build
+
