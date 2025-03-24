@@ -19,7 +19,7 @@ public class GeminiRAGChat : MonoBehaviour
     [SerializeField] private GameObject aiMessagePrefab;
     [SerializeField] private Transform chatContent; // Assign the Content of the ScrollRect
 
-    private string apiKey = "Gemini-APIkey"; // Replace with your Gemini API key
+    private string apiKey = "AIzaSyDb5yn93KUmiv2uUsboz0aIK53RKt7uC9c"; // Replace with your Gemini API key
     private string geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
     private string embeddingUrl = "https://generativelanguage.googleapis.com/v1beta/models/embedding-001:embedContent"; // For vector embeddings
     private List<GeminiMessage> messages;
@@ -308,7 +308,7 @@ public class GeminiRAGChat : MonoBehaviour
         GameObject messagePrefab = isUser ? userMessagePrefab : aiMessagePrefab;
         GameObject messageInstance = Instantiate(messagePrefab, chatContent);
         TMP_Text messageText = messageInstance.GetComponentInChildren<TMP_Text>();
-        string label = isUser ? "You: " : "Bot: ";
+        string label = isUser ? "You: " : "Chatgaroo: ";
         messageText.text = label + message;
 
         // Ensure the chat scrolls to the bottom when a new message is added
