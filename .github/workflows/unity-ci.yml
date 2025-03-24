@@ -1,26 +1,38 @@
 name: Unity Build
 
-on: push
+on: 
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
+    name: Build Unity Project
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Setup Unity
-        uses: game-ci/unity-setup@v2  # Fix: Use v2 instead of v3
+      - name: Cache Library
+        uses: actions/cache@v3
         with:
-          unityVersion: 2022.3.5f1  # Change this to your Unity version
+          path: Library
+          key: Library-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            Library-${{ runner.os }}-
 
-      - name: Build Unity Project
-        run: |
-          mkdir -p Build
-          unity-editor -quit -batchmode -nographics -logfile -buildTarget StandaloneWindows64 -projectPath . -executeMethod BuildScript.Build
+      - name: Unity Build
+        uses: game-ci/unity-builder@v2
+        with:
+          unityVersion: 6000.0.32f1  # Change to your Unity version
+          targetPlatform: StandaloneWindows64
 
-      - name: Upload Build Artifact
+      - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: UnityBuild
-          path: Build/
+          name: Build
+          path: build
