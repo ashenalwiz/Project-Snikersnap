@@ -4,6 +4,7 @@ using TMPro;
 using System.Collections.Generic;
 using System.IO;
 using System;
+using UnityEngine.SceneManagement;
 
 public class LetterSoundMatching : MonoBehaviour
 {
@@ -92,6 +93,10 @@ public class LetterSoundMatching : MonoBehaviour
         public List<SessionData> sessions = new List<SessionData>();
     }
 
+    public Button replayButton;
+    public Button exitButton;
+    public Button nextGameButton;
+
     void Awake()
     {
         LogToFile("Awake called - initializing audio system");
@@ -137,6 +142,24 @@ public class LetterSoundMatching : MonoBehaviour
         
         // Start tracking session time
         sessionStartTime = DateTime.Now;
+
+        if (replayButton != null)
+        {
+            replayButton.onClick.RemoveAllListeners();
+            replayButton.onClick.AddListener(ReplayGame);
+        }
+
+        if (exitButton != null)
+        {
+            exitButton.onClick.RemoveAllListeners();
+            exitButton.onClick.AddListener(ExitGame);
+        }
+
+        if (nextGameButton != null)
+        {
+            nextGameButton.onClick.RemoveAllListeners();
+            nextGameButton.onClick.AddListener(PlayNextGame);
+        }
     }
 
     void ValidateUIElements()
@@ -388,16 +411,52 @@ public class LetterSoundMatching : MonoBehaviour
         }
     }
 
+    public GameObject star1;
+    public GameObject star2;
+    public GameObject star3;
+
     void FinishLevel()
     {
         LogToFile("Level Completed!");
         victoryPanel.SetActive(true);
         gameUI.SetActive(false);
         
+        // Show stars based on progress
+        ShowStarsBasedOnProgress();
+
         // Save session data
         SaveSessionSummary();
     }
-    
+
+    void ShowStarsBasedOnProgress()
+    {
+        float accuracy = totalTriesThisSession > 0 ? (float)correctTriesThisSession / totalTriesThisSession * 100 : 0;
+
+        // Hide all stars initially
+        if (star1 != null) star1.SetActive(false);
+        if (star2 != null) star2.SetActive(false);
+        if (star3 != null) star3.SetActive(false);
+
+        // Show stars based on accuracy
+        if (accuracy >= 85)
+        {
+            // if (star1 != null) star1.SetActive(true);
+            // if (star2 != null) star2.SetActive(true);
+            if (star3 != null) star3.SetActive(true);
+        }
+        else if (accuracy >= 40)
+        {
+            // if (star1 != null) star1.SetActive(true);
+            if (star2 != null) star2.SetActive(true);
+        }
+        else if (accuracy >= 0)
+        {
+            if (star1 != null) star1.SetActive(true);
+        }
+
+        LogToFile($"Stars displayed based on accuracy: {accuracy}%");
+    }
+
     #region Progress Tracking Methods
     
     void LoadPlayerProgress()
@@ -647,6 +706,25 @@ void LogToFile(string message)
         Debug.LogError($"Failed to write to log file: {e.Message}");
     }
     #endif
+}
+
+void ReplayGame()
+{
+    LogToFile("Replay button clicked - restarting the game");
+    SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+}
+
+void ExitGame()
+{
+    Debug.Log("Yes button pressed, going to TaskHolder...");
+    Time.timeScale = 1f; // Reset game speed
+    SceneManager.LoadScene("TaskHolder");
+}
+
+void PlayNextGame()
+{
+    LogToFile("Next Game button clicked - loading next scene");
+    SceneManager.LoadScene("Task3"); // Replace "NextGameScene" with the actual scene name
 }
 
 #endregion
