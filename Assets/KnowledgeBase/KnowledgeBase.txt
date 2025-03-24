@@ -3,15 +3,26 @@
 ## About Dyslexia
 Dyslexia is a learning difference that affects how the brain processes written and sometimes spoken language. It's not related to intelligence. Children with dyslexia often struggle with recognizing and processing individual sounds in words, which makes reading and spelling challenging. Phonological awareness is typically the main area of difficulty.
 
-## Letter Sound Match-Up Game
-The Letter Sound Match-Up game helps children connect the sounds of letters (phonemes) with their visual representations. Players hear a sound and must identify the corresponding letter or letter group. This builds phonological awareness, a critical skill for reading development in dyslexic children.
+These are the Task user can play in the  READAROO app.
 
-### Game Instructions
-1. Listen carefully to the sound played
-2. Look at the letter groups on screen
-3. Tap the letter or letter group that makes the sound you heard
-4. Get instant feedback - stars and sounds for correct answers!
-5. Progress through levels with increasing difficulty
+Task 1 (Letter  Tracing)- this is about tracing letters with your finger. instructions are given when you open the task. include all the Alphabet letters. once you complete one letter you can manually switch to other task.
+
+Task 2 (Letter Sound Match) - a button is placed in the middle of the game. once the button is pressed sound of a letter will come out. by carefully listen to it the user have to choose the correct letter by given letters. end of the task user can see the progress.
+
+Task 3 (Letter Catching) - in this task the specific letter will display on top of the screen. and the letters will start drop from the above. an animated basket is implemented allowing user to slide across the screen and catch the right letter. if a player wants to skip within letters a skip button is given.
+
+Task 4 (Number Tracing) - this is about tracing numbers with your finger. instructions are given when you open the task. include all the numbers from 0 - 10. once you complete one number you can manually switch to other number.
+
+Task 5 (Balloon pop) - 4 or 5 balloons will start to float on the display. the task is to pop the balloon which has the correct number on it.
+
+Task 6 (letter pattern) - similar letters will be given (d,b) and user have to match it with the correct sound.
+
+Task 7 (Word sound Match) - two words will be given and a audio button. once the button is pressed a word will come out. by listing to that word, user have to chose the correct word within given 2 words. points are given to correct answers.
+
+Task 8 (Word typing) - user have to type the correct word on the  given space. audio button will be placed above to hear the word. user will be get a hint image if they do not get the correct word after 2nd attempt. and users can skip words.
+
+Task 9 (Drag and drop letters) - this task only has 2 questions, on the premium version more words will be unlocked. one letter from the word will be missing and the user have to drag and drop the correct letter in to the given space.  
+
 
 ### Tips for Parents
 When helping your child with Letter Sound Match-Up, try these approaches:

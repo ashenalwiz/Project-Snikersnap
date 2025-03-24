@@ -162,11 +162,13 @@ public class FirebaseManager : MonoBehaviour
     // Logout functionality
     public void LogoutUser()
     {
+        Debug.Log("LogoutUser method called");
         StartCoroutine(LogoutLogic());
     }
 
     private IEnumerator LogoutLogic()
     {
+        Debug.Log("LogoutLogic coroutine started");
         ShowLoading(true);
 
         // Sync any remaining data before logout
@@ -185,6 +187,7 @@ public class FirebaseManager : MonoBehaviour
 
         ShowLoading(false);
         AuthUIManager.instance.LoginScreen();
+        Debug.Log("LogoutLogic coroutine completed");
     }
 
     // Remember Me functionality
