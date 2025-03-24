@@ -33,63 +33,34 @@ public class TypingGame : MonoBehaviour
     public AudioClip wrongSound;
     public AudioClip skipedSound;
     public AudioClip victoryEndSound;
-    public AudioClip[] wordAudioClips; // Array to hold 5 audio clips
-    private string[] words = { "Rock", "Cave", "Flag", "Dark", "Shark", "Cat", "Cup", "Nap", "Hello", "Yellow", "Lava", "Jump", "Run" }; // List of words
-    private int currentWordIndex = 0;  // Track current word
+    public AudioClip[] wordAudioClips;
+    private int currentWordIndex = 0;
     public UnityEngine.UI.Image hintImage;
     public Button skipButton;
     private Dictionary<string, Sprite> wordImageMap;
     private int attempts = 0;
 
-    [SerializeField] private string customSavePath = "Assets/GameData/";
     [SerializeField] private string saveFileName = "Task8UserProgress.json";
 
-    //----------------New Updates--------------------------
     private SessionData2 SessionData2 = new SessionData2();
     private string jsonFilePath;
 
-    public GameObject resultPanel;  // UI panel to show stars
-    public List<Image> starImages = new List<Image>(); // Array of star images to display results
+    public GameObject resultPanel;
+    public List<Image> starImages = new List<Image>();
     public TMP_Text finalScoreText;
 
     private int correctAnswers = 0;
     private int skippedWords = 0;
     public Button replayButton;
-    //-----------------------------------------------------
 
     void Start()
     {
-        // Initialize session data to avoid null references
-        if (SessionData2 == null)
-        {
-            SessionData2 = new SessionData2();
-        }
-        
-        if (SessionData2.wordAttempts == null)
-        {
-            SessionData2.wordAttempts = new List<WordAttempt>();
-        }
-
-        jsonFilePath = System.IO.Path.Combine(Application.persistentDataPath, saveFileName);
-
+        jsonFilePath = Path.Combine(Application.persistentDataPath, saveFileName);
         LoadPreviousData();
 
-        // Find star images if not assigned in inspector
-        if (starImages.Count == 0)
-        {
-            starImages = new List<Image>
-            {
-                GameObject.Find("Star1").GetComponent<Image>(),
-                GameObject.Find("Star2").GetComponent<Image>(),
-                GameObject.Find("Star3").GetComponent<Image>()
-            };
-        }
-
-        //--------Update---------------------------
         resultPanel.SetActive(false);
-        replayButton.gameObject.SetActive(false); // Hide replay button at start
+        replayButton.gameObject.SetActive(false);
         replayButton.onClick.AddListener(ReplayGame);
-        //-----------------------------------------
 
         playAudioButton.onClick.AddListener(PlayWordAudio);
         checkButton.onClick.AddListener(CheckWord);
@@ -98,14 +69,14 @@ public class TypingGame : MonoBehaviour
         hintImage.gameObject.SetActive(false);
         skipButton.gameObject.SetActive(false);
 
-        // Initialize word-image dictionary
         InitializeWordImageDictionary();
 
         feedbackText.text = "";
         Debug.Log("User Progress File Path: " + jsonFilePath);
+
+        PlayWordAudio(); // Start by playing the first word's audio
     }
-    
-    // Separate initialization method for word images
+
     private void InitializeWordImageDictionary()
     {
         wordImageMap = new Dictionary<string, Sprite>
@@ -125,7 +96,6 @@ public class TypingGame : MonoBehaviour
             { "Run", Resources.Load<Sprite>("HintImages/Run") }
         };
     }
-    //========================================================================
 
     void PlayWordAudio()
     {
@@ -133,13 +103,18 @@ public class TypingGame : MonoBehaviour
         {
             audioSource.clip = wordAudioClips[currentWordIndex];
             audioSource.Play();
+            Debug.Log($"Playing audio for word: {wordAudioClips[currentWordIndex].name}");
+        }
+        else
+        {
+            Debug.LogWarning("No more words to play.");
         }
     }
 
     public void CheckWord()
     {
-        string userInput = wordInputField.text.Trim().ToLower(); // Sanitize input
-        string correctWord = wordAudioClips[currentWordIndex].name.ToLower(); // Get current correct word
+        string userInput = wordInputField.text.Trim().ToLower();
+        string correctWord = wordAudioClips[currentWordIndex].name.ToLower();
 
         Debug.Log($"User Input: '{userInput}' | Correct Word: '{correctWord}'");
 
@@ -162,11 +137,11 @@ public class TypingGame : MonoBehaviour
             Debug.Log($"Added word attempt: {correctWord}, attempts: {attempts}, correct: true");
             SaveProgressToFile();
             attempts = 0;
-            hintImage.gameObject.SetActive(false); // Hide image if it was displayed
+            hintImage.gameObject.SetActive(false);
             skipButton.gameObject.SetActive(false);
-            //-----------------------------------------
 
-            Invoke("NextWord", 1.5f); // Wait 1.5 seconds before moving to next word
+            Debug.Log("Invoking NextWord method in 1.5 seconds.");
+            Invoke("NextWord", 1.5f);
         }
         else
         {
@@ -174,20 +149,17 @@ public class TypingGame : MonoBehaviour
             feedbackText.text = "Let's Try again.";
             audioSource.PlayOneShot(wrongSound);
 
-            //-------Update----------------------------------------------------
             if (attempts == 1)
             {
-                skipButton.gameObject.SetActive(true); // Show skip button after first mistake
+                skipButton.gameObject.SetActive(true);
             }
 
             if (attempts == 2)
             {
                 ShowHintImage();
             }
-            //------------------------------------------------------------------
         }
     }
-    //------------Update----------------------------------------------------------------
 
     void ShowHintImage()
     {
@@ -195,8 +167,8 @@ public class TypingGame : MonoBehaviour
 
         if (wordImageMap.ContainsKey(currentWord))
         {
-            hintImage.sprite = wordImageMap[currentWord]; // Set correct image
-            hintImage.gameObject.SetActive(true); // Show image
+            hintImage.sprite = wordImageMap[currentWord];
+            hintImage.gameObject.SetActive(true);
             Debug.Log("Hint Image Displayed for: " + currentWord);
         }
         else
@@ -204,8 +176,6 @@ public class TypingGame : MonoBehaviour
             Debug.LogWarning("No Hint Image found for: " + currentWord);
         }
     }
-
-    //-------------Update-SkipButton---------------------------------------------------------------------
 
     void SkipWord()
     {
@@ -232,92 +202,70 @@ public class TypingGame : MonoBehaviour
         attempts = 0;
         hintImage.gameObject.SetActive(false);
         skipButton.gameObject.SetActive(false);
+
+        Debug.Log("Invoking NextWord method in 1.3 seconds.");
         Invoke("NextWord", 1.3f);
     }
 
-
-    //----------------------------------------------------------------------------------
     void NextWord()
     {
-        currentWordIndex++; // Move to next word
+        currentWordIndex++;
+        Debug.Log($"Moving to next word. Current word index: {currentWordIndex}");
 
-        if (currentWordIndex < wordAudioClips.Length) // Check if words are remaining
+        if (currentWordIndex < wordAudioClips.Length)
         {
-            wordInputField.text = ""; // Clear input field
-            feedbackText.text = "";   // Clear feedback text
+            wordInputField.text = "";
+            feedbackText.text = "";
             attempts = 0;
             hintImage.gameObject.SetActive(false);
             skipButton.gameObject.SetActive(false);
-            PlayWordAudio(); // Play next word audio automatically
+            PlayWordAudio();
         }
         else
         {
             CalculateFinalScore();
 
-            feedbackText.text = "Task Complete!"; // Show message when all words are completed
+            feedbackText.text = "Task Complete!";
             checkButton.interactable = false;
-            // Disable check button
             skipButton.interactable = false;
             audioSource.PlayOneShot(victoryEndSound);
             SaveProgressToFile();
         }
     }
 
-    //------------------------New Features : Score & Stars-------------------------------------------------------------------------
-    void ShowResults()
-    {
-        // --- Calculate Score ---
-        int totalWords = wordAudioClips.Length; // Using wordAudioClips instead of words for accuracy
-        float score = ((float)correctAnswers / totalWords) * 100f;
-
-        // --- Determine Stars ---
-        int starsEarned = 0;
-        if (score >= 90) starsEarned = 3;
-        else if (score >= 70) starsEarned = 2;
-        else if (score >= 50) starsEarned = 1;
-        else starsEarned = 0;
-
-        // --- Show Result Panel ---
-        resultPanel.SetActive(true);
-        Debug.Log("Final Score: " + score + "% | Stars Earned: " + starsEarned);
-    }
-
     void CalculateFinalScore()
     {
-        int totalWords = wordAudioClips.Length; // Changed from words.Length to wordAudioClips.Length
-        float score = ((float)correctAnswers / totalWords) * 100; // Score formula
+        int totalWords = wordAudioClips.Length;
+        float score = ((float)correctAnswers / totalWords) * 100;
 
         ShowStars(score);
     }
-    
+
     void ShowStars(float score)
     {
-        resultPanel.SetActive(true); // Show result UI
-        finalScoreText.text = "Final Score: " + score.ToString("F0") + "%"; // Show final percentage
+        resultPanel.SetActive(true);
+        finalScoreText.text = "Final Score: " + score.ToString("F0") + "%";
 
         replayButton.gameObject.SetActive(true);
         replayButton.interactable = true;
 
-        // Hide all stars initially
         foreach (Image star in starImages)
         {
             star.gameObject.SetActive(false);
         }
 
-        // Determine star rating based on score
-        if (score >= 90) // 3 stars
+        if (score >= 90)
         {
             for (int i = 0; i < 3; i++) starImages[i].gameObject.SetActive(true);
         }
-        else if (score >= 70) // 2 stars
+        else if (score >= 70)
         {
             for (int i = 0; i < 2; i++) starImages[i].gameObject.SetActive(true);
         }
-        else if (score >= 50) // 1 star
+        else if (score >= 50)
         {
             starImages[0].gameObject.SetActive(true);
         }
-        // If below 50%, no stars are shown
     }
 
     void ReplayGame()
@@ -337,23 +285,20 @@ public class TypingGame : MonoBehaviour
         skipButton.gameObject.SetActive(false);
 
         resultPanel.SetActive(false);
-        replayButton.gameObject.SetActive(false); // Hide replay button
+        replayButton.gameObject.SetActive(false);
 
-        // Create a new session data object to avoid carrying over references
         SessionData2 = new SessionData2();
         SessionData2.wordAttempts = new List<WordAttempt>();
 
-        PlayWordAudio(); // Start first word again
+        PlayWordAudio();
     }
 
     void SaveProgressToFile()
     {
-        // Ensure the directory exists
         string directory = Application.persistentDataPath;
-        string fullPath = System.IO.Path.Combine(directory, saveFileName);
+        string fullPath = Path.Combine(directory, saveFileName);
         Debug.Log($"Target save path: {fullPath}");
 
-        // Check if SessionData2 is properly initialized
         if (SessionData2 == null)
         {
             Debug.LogError("Session data is null! Creating new instance.");
@@ -367,16 +312,14 @@ public class TypingGame : MonoBehaviour
         }
 
         Debug.Log($"Attempting to save data. Current session has {SessionData2.wordAttempts.Count} attempts");
-        
-        // Log current attempts for debugging
+
         foreach (var attempt in SessionData2.wordAttempts)
         {
             Debug.Log($"Current session word: {attempt.word}, Attempts: {attempt.attempts}, Correct: {attempt.correct}, Skipped: {attempt.skipped}");
         }
 
-        // Handle existing data
         SessionData2 existingData = new SessionData2();
-        
+
         if (File.Exists(fullPath))
         {
             try
@@ -387,13 +330,12 @@ public class TypingGame : MonoBehaviour
                 if (!string.IsNullOrEmpty(jsonContent))
                 {
                     existingData = JsonUtility.FromJson<SessionData2>(jsonContent);
-                    
-                    // Safety check for null lists
+
                     if (existingData.wordAttempts == null)
                     {
                         existingData.wordAttempts = new List<WordAttempt>();
                     }
-                    
+
                     Debug.Log($"Successfully loaded existing data with {existingData.wordAttempts.Count} attempts");
                 }
                 else
@@ -415,18 +357,16 @@ public class TypingGame : MonoBehaviour
             existingData.wordAttempts = new List<WordAttempt>();
         }
 
-        // Verify that both lists are initialized
         if (existingData.wordAttempts == null)
         {
             existingData.wordAttempts = new List<WordAttempt>();
         }
-        
+
         if (SessionData2.wordAttempts == null)
         {
             SessionData2.wordAttempts = new List<WordAttempt>();
         }
 
-        // Make a deep copy of the current session data to avoid reference issues
         List<WordAttempt> currentSessionCopy = new List<WordAttempt>();
         foreach (var attempt in SessionData2.wordAttempts)
         {
@@ -440,18 +380,14 @@ public class TypingGame : MonoBehaviour
             currentSessionCopy.Add(copy);
         }
 
-        // Add current session data to existing data
         existingData.wordAttempts.AddRange(currentSessionCopy);
 
-        // Log the combined data
         Debug.Log($"Combined data now has {existingData.wordAttempts.Count} total attempts");
 
         try
         {
-            // Convert to JSON - make sure we're serializing a valid object
-            string json = JsonUtility.ToJson(existingData, true); // true for pretty print
+            string json = JsonUtility.ToJson(existingData, true);
 
-            // Verify the JSON content
             Debug.Log($"Generated JSON length: {json.Length}");
             if (json.Length > 100)
             {
@@ -465,33 +401,27 @@ public class TypingGame : MonoBehaviour
             if (string.IsNullOrEmpty(json) || json == "{}")
             {
                 Debug.LogError("ERROR: Generated JSON is empty - serialization failed!");
-                // Try to log more details about the object being serialized
                 Debug.LogError($"existingData is null? {existingData == null}");
                 Debug.LogError($"existingData.wordAttempts is null? {existingData.wordAttempts == null}");
                 return;
             }
 
-            // Force the directory to exist one more time just to be sure
             Directory.CreateDirectory(directory);
 
-            // Write to file
             File.WriteAllText(fullPath, json);
 
             Debug.Log($"Successfully saved data to: {fullPath}");
 
-            // Verify the file was written correctly
             if (File.Exists(fullPath))
             {
                 string fileContent = File.ReadAllText(fullPath);
                 Debug.Log($"Verified file content length: {fileContent.Length}");
 
-                // If we're in the Unity Editor, refresh the asset database
-                #if UNITY_EDITOR
+#if UNITY_EDITOR
                 UnityEditor.AssetDatabase.Refresh();
-                #endif
+#endif
             }
 
-            // Only clear the session data if the save was successful
             SessionData2 = new SessionData2();
             SessionData2.wordAttempts = new List<WordAttempt>();
         }
@@ -500,14 +430,14 @@ public class TypingGame : MonoBehaviour
             Debug.LogError($"Error saving data: {ex.Message}\nStack trace: {ex.StackTrace}");
         }
 
-        FirebaseProgressManager.Instance.UploadProgressToFirebase();
-
+        // Uncomment the following line if you have FirebaseProgressManager implemented
+        // FirebaseProgressManager.Instance.UploadProgressToFirebase();
     }
 
     void LoadPreviousData()
     {
         string directory = Application.persistentDataPath;
-        string fullPath = System.IO.Path.Combine(directory, saveFileName);
+        string fullPath = Path.Combine(directory, saveFileName);
         if (File.Exists(fullPath))
         {
             try
@@ -518,7 +448,6 @@ public class TypingGame : MonoBehaviour
                     SessionData2 loadedData = JsonUtility.FromJson<SessionData2>(jsonData);
                     Debug.Log($"Loaded previous data with {loadedData.wordAttempts.Count} word attempts");
 
-                    // Initialize a new session data for this gameplay session
                     SessionData2 = new SessionData2();
                     SessionData2.wordAttempts = new List<WordAttempt>();
                 }
@@ -535,53 +464,6 @@ public class TypingGame : MonoBehaviour
             Debug.Log($"No previous save file found at {fullPath}");
             SessionData2 = new SessionData2();
             SessionData2.wordAttempts = new List<WordAttempt>();
-        }
-    }
-
-    public static class FileHandler
-    {
-        public static string GetFilePath(string fileName)
-        {
-            return System.IO.Path.Combine(Application.persistentDataPath, fileName);
-        }
-
-        public static void SaveToJSON<T>(T data, string fileName)
-        {
-            string filePath = GetFilePath(fileName);
-            string json = JsonUtility.ToJson(data, true);
-
-            try
-            {
-                string directory = System.IO.Path.GetDirectoryName(filePath);
-                if (!Directory.Exists(directory) && !string.IsNullOrEmpty(directory))
-                {
-                    Directory.CreateDirectory(directory);
-                }
-
-                File.WriteAllText(filePath, json);
-
-                Debug.Log($"Data saved successfully to: {filePath}");
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError($"Error saving file: {ex.Message}");
-            }
-        }
-
-        public static T LoadFromJSON<T>(string fileName) where T : new()
-        {
-            string filePath = GetFilePath(fileName);
-            if (File.Exists(filePath))
-            {
-                string jsonData = File.ReadAllText(filePath);
-                Debug.Log($"Data loaded from: {filePath}");  // Debugging log to check the file path
-                return JsonUtility.FromJson<T>(jsonData);
-            }
-            else
-            {
-                Debug.LogWarning($"No data found at {filePath}. Returning new instance.");
-                return new T(); // If no file is found, return a new instance
-            }
         }
     }
 }
