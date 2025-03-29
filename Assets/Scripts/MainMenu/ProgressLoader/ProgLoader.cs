@@ -8,6 +8,11 @@ public class ProgLoader : MonoBehaviour
     {
         SceneManager.LoadScene(sceneName);
     }
+    public void LogOut()
+    {
+        
+        SceneManager.LoadScene("Register");
+    }
 
     // Load the first scene
     public void LoadFirstScene()

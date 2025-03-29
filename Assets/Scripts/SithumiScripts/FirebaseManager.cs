@@ -6,6 +6,8 @@ using Firebase.Database;
 using System.IO;
 using TMPro;
 using UnityEngine.UI;
+using System;
+using UnityEngine.SceneManagement;
 
 public class FirebaseManager : MonoBehaviour
 {
@@ -62,6 +64,12 @@ public class FirebaseManager : MonoBehaviour
     private TMP_InputField RegisterConfirmPassword;
     [SerializeField]
     private TMP_Text registerOutputText;
+
+    [Header("User Info Display")]
+    [SerializeField]
+    public TMP_Text usernameText;
+    [SerializeField]
+    public TMP_Text emailText;
 
     // Store registration info for potential "Remember Me" after verification
     private string lastRegisteredEmail;
@@ -164,6 +172,7 @@ public class FirebaseManager : MonoBehaviour
     {
         Debug.Log("LogoutUser method called");
         StartCoroutine(LogoutLogic());
+
     }
 
     private IEnumerator LogoutLogic()
@@ -188,6 +197,7 @@ public class FirebaseManager : MonoBehaviour
         ShowLoading(false);
         AuthUIManager.instance.LoginScreen();
         Debug.Log("LogoutLogic coroutine completed");
+        SceneManager.LoadScene("Register");
     }
 
     // Remember Me functionality
@@ -340,6 +350,10 @@ public class FirebaseManager : MonoBehaviour
 
     private void InitializeFirebase()
     {
+        FirebaseApp app = FirebaseApp.Create(new AppOptions
+        {
+            DatabaseUrl = new Uri("https://readaroo-project-default-rtdb.firebaseio.com/") // Replace with your Firebase Realtime Database URL
+        });
         auth = FirebaseAuth.DefaultInstance;
         StartCoroutine(CheckAutoLogin());
 
@@ -436,6 +450,7 @@ public class FirebaseManager : MonoBehaviour
             if (signedIn)
             {
                 Debug.Log($"Signed In: {user.DisplayName}");
+                UpdateUserInfoUI();
             }
         }
     }
@@ -527,10 +542,12 @@ public class FirebaseManager : MonoBehaviour
             if (user.IsEmailVerified)
             {
                 // Load user progress data before changing scene with callback
-                yield return StartCoroutine(LoadUserProgressData(user.UserId, () => {
+                yield return StartCoroutine(LoadUserProgressData(user.UserId, () =>
+                {
                     // Now we can safely change scenes
                     FirebaseGameManager.instance.ChangeScene(1);
                 }));
+                UpdateUserInfoUI();
             }
             else
             {
@@ -636,11 +653,28 @@ public class FirebaseManager : MonoBehaviour
                 {
                     Debug.Log($"Firebase User Created Successfully: {user.DisplayName} ({user.UserId})");
                     StartCoroutine(sendVerificationEmail());
+                    UpdateUserInfoUI();
                 }
                 ShowLoading(false);
             }
         }
     }
+    private void UpdateUserInfoUI()
+    {
+        if (user != null)
+        {
+            if (usernameText != null)
+            {
+                usernameText.text = user.DisplayName ?? "No Username";
+            }
+
+            if (emailText != null)
+            {
+                emailText.text = user.Email ?? "No Email";
+            }
+        }
+    }
+
 
     private IEnumerator sendVerificationEmail()
     {
