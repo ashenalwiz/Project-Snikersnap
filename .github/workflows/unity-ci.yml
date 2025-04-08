@@ -1,6 +1,6 @@
-name: Unity Build
+name: Unity CI - No License
 
-on: 
+on:
   push:
     branches:
       - main
@@ -10,30 +10,27 @@ on:
 
 jobs:
   build:
-    name: Build Unity Project
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Cache Library
-        uses: actions/cache@v3
-        with:
-          path: Library
-          key: Library-${{ runner.os }}-${{ github.sha }}
-          restore-keys: |
-            Library-${{ runner.os }}-
+    - name: Cache Unity packages
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.npm
+          ~/.cache/unity3d
+          ~/.local/share/unity3d
+        key: ${{ runner.os }}-unity-cache
 
-      - name: Unity Build
-        uses: game-ci/unity-builder@v2
-        with:
-          unityVersion: 6000.0.32f1 # Change to your Unity version
-          targetPlatform: StandaloneWindows64
+    - name: Set up Unity
+      uses: game-ci/unity-actions/setup@v2
+      with:
+        unityVersion: 2022.3.0f1
 
-      - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v4  # Changed to v4
-        with:
-          name: Build
-          path: build
-
+    - name: Build project
+      uses: game-ci/unity-actions/build@v2
+      with:
+        targetPlatform: StandaloneWindows64
