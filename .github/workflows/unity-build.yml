@@ -1,20 +1,37 @@
-name: Unity CI (Simple Build)
+name: Unity CI Build
 on:
   push:
-    branches: [ main ]  # only run on the main branch
+    branches: [ main ]
   pull_request:
-    branches: [ main ]  # when you open a PR to main
+    branches: [ main ]
 jobs:
   build:
-    runs-on: ubuntu-latest  # run on the latest Ubuntu image
+    name: Build Unity Project
+    runs-on: ubuntu-latest
     steps:
-    - name: Checkout project
-      uses: actions/checkout@v3  # pulls your repo's code
-    - name: Build Unity project
-      uses: game-ci/unity-builder@v2  # the Unity builder action
-      with:
-        unityVersion: 6000.0.34f1  # your actual Unity version
-        targetPlatform: WebGL  # change to Android, or StandaloneWindows64 if needed
-      env:
-        UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}  # reference GitHub secrets
-        UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          lfs: true
+      - name: Create LFS file list
+        run: git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
+      - name: Cache LFS objects
+        uses: actions/cache@v3
+        with:
+          path: .git/lfs
+          key: ${{ runner.os }}-lfs-${{ hashFiles('.lfs-assets-id') }}
+          restore-keys: ${{ runner.os }}-lfs-
+      - name: Cache Library folder
+        uses: actions/cache@v3
+        with:
+          path: Library
+          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: Library-
+      - name: Build project
+        uses: game-ci/unity-builder@v2
+        env:
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion: 6000.0.34f1  # Replace with your Unity version
+          targetPlatform: Android     # Change to your target platform
