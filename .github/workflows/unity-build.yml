@@ -21,14 +21,16 @@ jobs:
           git clean -xfd
           git reset --hard
 
-      - name: Create LFS file list
-        run: git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
+      - name: Create LFS file list (in temp folder)
+        run: |
+          mkdir -p .github/temp
+          git lfs ls-files -l | cut -d' ' -f1 | sort > .github/temp/lfs-assets-id
 
       - name: Cache LFS objects
         uses: actions/cache@v3
         with:
           path: .git/lfs
-          key: ${{ runner.os }}-lfs-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          key: ${{ runner.os }}-lfs-${{ hashFiles('.github/temp/lfs-assets-id') }}
           restore-keys: ${{ runner.os }}-lfs-
 
       - name: Cache Library folder
