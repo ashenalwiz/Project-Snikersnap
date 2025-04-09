@@ -13,18 +13,8 @@ jobs:
     - name: Build Unity project
       uses: game-ci/unity-builder@v2  # the Unity builder action
       with:
-        unityVersion: 2022.3.0f1  # specify Unity version
+        unityVersion: 6000.0.34f1  # your actual Unity version
         targetPlatform: WebGL  # change to Android, or StandaloneWindows64 if needed
       env:
-        UNITY_EMAIL: ""  # leave empty for Personal (free) Unity license
-        UNITY_PASSWORD: ""
-        UNITY_SERIAL: ""
-
-
-
-
-
-
-
-
-
+        UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}  # reference GitHub secrets
+        UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
