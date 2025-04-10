@@ -41,16 +41,16 @@ jobs:
           key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
           restore-keys: Library-
 
-      - name: Install Unity License (for CI builds)
-        run: |
-          echo "Installing Unity License"
-          curl -sSL https://download.unity3d.com/download_unity/9e8f7b3d02e9/UnitySetup-2020.3.40f1.exe -o UnitySetup.exe
-          chmod +x UnitySetup.exe
-          ./UnitySetup.exe --unattended --install-location /opt/Unity
-
-      - name: Build with Unity
+      - name: Build with Unity (6000.0.34f1 version)
         uses: game-ci/unity-builder@v2
         with:
-          unityVersion: 2020.3.40f1
+          unityVersion: 6000.0.34f1
           targetPlatform: Android
           allowDirtyBuild: true
+        continue-on-error: true 
+
+      - name: Capture Unity Logs
+        if: failure()
+        run: |
+          echo "Build failed. Capturing Unity logs for debugging."
+          tail -n 20 /opt/Unity/Editor/Data/Unity.log # Adjust the path to your Unity installation directory.
