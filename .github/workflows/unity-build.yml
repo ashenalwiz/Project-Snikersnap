@@ -1,0 +1,51 @@
+name: Unity CI Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build Unity Project
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          lfs: true
+
+      - name: Clean working directory
+        run: |
+          git clean -xfd
+          git reset --hard
+
+      - name: Create LFS file list (in temp folder)
+        run: |
+          mkdir -p .github/temp
+          git lfs ls-files -l | cut -d' ' -f1 | sort > .github/temp/lfs-assets-id
+
+      - name: Cache LFS objects
+        uses: actions/cache@v3
+        with:
+          path: .git/lfs
+          key: ${{ runner.os }}-lfs-${{ hashFiles('.github/temp/lfs-assets-id') }}
+          restore-keys: ${{ runner.os }}-lfs-
+
+      - name: Cache Library folder
+        uses: actions/cache@v3
+        with:
+          path: Library
+          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: Library-
+
+      - name: Build project
+        uses: game-ci/unity-builder@v2
+        env:
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion: 6000.0.34f1  # Replace with your Unity version
+          targetPlatform: Android     # Change to your target platform
+          allowDirtyBuild: true 
