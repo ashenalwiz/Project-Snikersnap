@@ -41,12 +41,8 @@ jobs:
           key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
           restore-keys: Library-
 
-      - name: Build with Unity
+      - name: Build with Unity (without license)
         uses: game-ci/unity-builder@v2
-        env:
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}  # Optional if using personal license workflow
         with:
           unityVersion: 6000.0.34f1
           targetPlatform: Android
