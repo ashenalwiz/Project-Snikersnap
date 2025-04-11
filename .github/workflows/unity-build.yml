@@ -12,110 +12,39 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        with:
-          lfs: true
-          fetch-depth: 0
-          
-      # LFS handling
-      - name: Create LFS file list
+        
+      - name: Basic validation
         run: |
-          mkdir -p .github/temp
-          git lfs ls-files -l | cut -d' ' -f1 | sort > .github/temp/lfs-assets-id
+          echo "Running basic Unity project validation"
           
-      - name: Cache LFS objects
-        uses: actions/cache@v3
-        with:
-          path: .git/lfs
-          key: ${{ runner.os }}-lfs-${{ hashFiles('.github/temp/lfs-assets-id') }}
-          restore-keys: ${{ runner.os }}-lfs-
-      
-      # Project validation
-      - name: Validate project structure
-        run: |
-          echo "Validating Unity project structure"
+          # Create a validation report
+          echo "Validation Report" > validation-report.txt
+          echo "==================" >> validation-report.txt
+          echo "Date: $(date)" >> validation-report.txt
+          echo "Repository: $GITHUB_REPOSITORY" >> validation-report.txt
+          echo "Branch: $GITHUB_REF_NAME" >> validation-report.txt
+          echo "Commit: $GITHUB_SHA" >> validation-report.txt
           
-          # Check essential Unity folders
-          for dir in Assets Packages ProjectSettings; do
+          # Check if project directories exist
+          echo -e "\nProject Structure:" >> validation-report.txt
+          for dir in Assets ProjectSettings Packages; do
             if [ -d "$dir" ]; then
-              echo "[PASS] $dir directory exists"
+              echo "- $dir: EXISTS" >> validation-report.txt
             else
-              echo "[FAIL] $dir directory missing - attempting to create"
+              echo "- $dir: MISSING (created placeholder)" >> validation-report.txt
               mkdir -p "$dir"
+              touch "$dir/.placeholder"
             fi
           done
           
-          # Create project version file if it doesn't exist
-          if [ ! -f "ProjectSettings/ProjectVersion.txt" ]; then
-            echo "[INFO] Creating minimal ProjectVersion.txt"
-            mkdir -p ProjectSettings
-            echo "m_EditorVersion: 6000.0.34f1" > ProjectSettings/ProjectVersion.txt
-          fi
+          # Verify the report exists
+          ls -la validation-report.txt
           
-          echo "Unity project structure validated successfully"
+          echo "Validation complete"
       
-      # Create project artifact
-      - name: Create project summary
-        run: |
-          echo "Creating project summary"
-          
-          # Create a simple project info file
-          echo "Project: $(basename $GITHUB_REPOSITORY)" > project-info.txt
-          echo "Branch: $GITHUB_REF_NAME" >> project-info.txt
-          echo "Commit: $GITHUB_SHA" >> project-info.txt
-          echo "Date: $(date)" >> project-info.txt
-          
-          echo "Project summary created"
-      
-      # Upload artifact from validation job
-      - name: Upload project summary
+      - name: Upload validation report
         uses: actions/upload-artifact@v3
         with:
-          name: project-summary
-          path: project-info.txt
+          name: validation-report
+          path: validation-report.txt
           retention-days: 7
-          
-  deploy:
-    name: Deploy Project Artifacts
-    needs: validate
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        
-      # Download artifact from previous job
-      - name: Download project summary
-        uses: actions/download-artifact@v3
-        with:
-          name: project-summary
-          
-      - name: Package project files
-        run: |
-          echo "Creating project artifact package"
-          
-          # Create directories if needed
-          mkdir -p Assets ProjectSettings Packages
-          
-          # Create a simple manifest with project details
-          echo "Project: $(basename $GITHUB_REPOSITORY)" > manifest.txt
-          echo "Branch: $GITHUB_REF_NAME" >> manifest.txt
-          echo "Commit: $GITHUB_SHA" >> manifest.txt
-          echo "Date: $(date)" >> manifest.txt
-          
-          # Create a zip with project files
-          zip -r project_source.zip Assets ProjectSettings Packages manifest.txt project-info.txt
-            
-          echo "Project artifact package created"
-          
-      - name: Upload project artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: unity-project-source
-          path: project_source.zip
-          retention-days: 14
-          
-      - name: Create deployment marker
-        run: |
-          echo "Creating deployment marker"
-          echo "Deployment completed at $(date)" > deployment.txt
-          echo "Deployment marker created"
