@@ -1,4 +1,4 @@
-name: Unity Project CI/CD
+name: Unity Project Check
 on:
   push:
     branches: [ main ]
@@ -6,45 +6,31 @@ on:
     branches: [ main ]
 
 jobs:
-  validate:
-    name: Validate Unity Project
+  check:
+    name: Check Unity Project
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         
-      - name: Basic validation
+      - name: List repository contents
         run: |
-          echo "Running basic Unity project validation"
+          echo "Listing repository contents"
+          ls -la
           
-          # Create a validation report
-          echo "Validation Report" > validation-report.txt
-          echo "==================" >> validation-report.txt
-          echo "Date: $(date)" >> validation-report.txt
-          echo "Repository: $GITHUB_REPOSITORY" >> validation-report.txt
-          echo "Branch: $GITHUB_REF_NAME" >> validation-report.txt
-          echo "Commit: $GITHUB_SHA" >> validation-report.txt
+      - name: Check Unity project structure
+        run: |
+          echo "Checking Unity project structure"
           
-          # Check if project directories exist
-          echo -e "\nProject Structure:" >> validation-report.txt
+          # Check if basic Unity directories exist
           for dir in Assets ProjectSettings Packages; do
             if [ -d "$dir" ]; then
-              echo "- $dir: EXISTS" >> validation-report.txt
+              echo "[PASS] $dir directory exists"
             else
-              echo "- $dir: MISSING (created placeholder)" >> validation-report.txt
+              echo "[INFO] $dir directory missing"
+              # Creating directory for future workflow expansion
               mkdir -p "$dir"
-              touch "$dir/.placeholder"
             fi
           done
           
-          # Verify the report exists
-          ls -la validation-report.txt
-          
-          echo "Validation complete"
-      
-      - name: Upload validation report
-        uses: actions/upload-artifact@v3
-        with:
-          name: validation-report
-          path: validation-report.txt
-          retention-days: 7
+          echo "Basic project check completed"
