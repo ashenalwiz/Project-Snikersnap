@@ -1,19 +1,22 @@
-name: Unity CI Check
+name: Unity Project CI/CD
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+
 jobs:
-  check:
-    name: Check Unity Project
+  validate:
+    name: Validate Unity Project
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
           lfs: true
+          fetch-depth: 0
           
+      # LFS handling
       - name: Create LFS file list
         run: |
           mkdir -p .github/temp
@@ -25,35 +28,117 @@ jobs:
           path: .git/lfs
           key: ${{ runner.os }}-lfs-${{ hashFiles('.github/temp/lfs-assets-id') }}
           restore-keys: ${{ runner.os }}-lfs-
-          
-      - name: Cache Library folder
-        uses: actions/cache@v3
-        with:
-          path: Library
-          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
-          restore-keys: Library-
-          
-      - name: List project structure
+      
+      # Project validation
+      - name: Validate project structure
         run: |
-          echo "Checking Unity project structure"
-          ls -la
-          echo "Project structure verified successfully"
+          echo "Validating Unity project structure"
           
-      - name: Check Unity project files
-        run: |
-          echo "Validating Unity project files"
+          # Check essential Unity folders
+          for dir in Assets Packages ProjectSettings; do
+            if [ -d "$dir" ]; then
+              echo "[PASS] $dir directory exists"
+            else
+              echo "[FAIL] $dir directory missing"
+              exit 1
+            fi
+          done
+          
+          # Check project version file
           if [ -f "ProjectSettings/ProjectVersion.txt" ]; then
-            echo "✅ Project settings found"
-            cat ProjectSettings/ProjectVersion.txt
+            echo "[PASS] ProjectVersion.txt exists"
           else
-            echo "❌ Project settings not found"
+            echo "[FAIL] ProjectVersion.txt missing"
+            exit 1
           fi
           
-          if [ -d "Assets" ]; then
-            echo "✅ Assets folder found"
-            ls -la Assets
-          else
-            echo "❌ Assets folder not found"
-          fi
+          echo "Unity project structure validated successfully"
+      
+      # Script syntax check (basic)
+      - name: Check C# script syntax
+        run: |
+          echo "Checking C# scripts for basic syntax issues"
           
-          echo "Unity project validated"
+          # Find C# files that contain syntax markers that might indicate problems
+          find Assets -name "*.cs" -type f -exec grep -l "<<<\|>>>\|===" {} \; > .github/temp/conflict_files.txt
+          
+          if [ -s .github/temp/conflict_files.txt ]; then
+            echo "[FAIL] Possible merge conflicts found in these files:"
+            cat .github/temp/conflict_files.txt
+            exit 1
+          else
+            echo "[PASS] No merge conflict markers found in C# scripts"
+          fi
+      
+      # Scene validation
+      - name: Validate Unity scenes
+        run: |
+          echo "Checking Unity scene files"
+          
+          # Count scene files
+          SCENE_COUNT=$(find Assets -name "*.unity" | wc -l)
+          echo "Found $SCENE_COUNT scene files"
+          
+          # List scenes
+          find Assets -name "*.unity" | sort
+          
+          echo "Scene validation complete"
+      
+      # Project stats and insights
+      - name: Generate project stats
+        run: |
+          echo "Generating Unity project statistics"
+          
+          echo "Assets in project:"
+          find Assets -type f | grep -v "\.meta$" | sort | wc -l
+          
+          echo "C# scripts in project:"
+          find Assets -name "*.cs" | wc -l
+          
+          echo "Total lines of C# code:"
+          find Assets -name "*.cs" -exec cat {} \; | wc -l
+          
+          echo "Project structure:"
+          find Assets -type d | sort | sed 's/[^/]*/  /g; s/  //' 
+          
+          echo "Project statistics generated"
+          
+  deploy:
+    name: Deploy Project Artifacts
+    needs: validate
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Package project files
+        run: |
+          echo "Creating project artifact package"
+          
+          # Create a simple manifest with project details
+          echo "Project: $(basename $GITHUB_REPOSITORY)" > manifest.txt
+          echo "Branch: $GITHUB_REF_NAME" >> manifest.txt
+          echo "Commit: $GITHUB_SHA" >> manifest.txt
+          echo "Date: $(date)" >> manifest.txt
+          
+          # Create a zip with key project files (excluding large binaries)
+          zip -r project_source.zip Assets ProjectSettings Packages manifest.txt \
+            -x "*/bin/*" -x "*/obj/*" -x "*/Temp/*" -x "*/Library/*"
+            
+          echo "Project artifact package created"
+          
+      - name: Upload project artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: unity-project-source
+          path: project_source.zip
+          retention-days: 14
+          
+      - name: Create deployment tag
+        run: |
+          echo "Creating deployment tag"
+          TAG_NAME="deploy-$(date +'%Y%m%d-%H%M%S')"
+          git tag $TAG_NAME
+          git push origin $TAG_NAME
+          echo "Deployment tagged as $TAG_NAME"
